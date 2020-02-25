@@ -1,3 +1,13 @@
 devel/
 build/
 .vscode/
+custom_commands.bash
+build_isolated/
+devel_isolated/
+install_isolated/
+frames.gv
+frames.pdf
+cartographer/
+cartographer_ros/
+ceres-solver/
+.rosinstall*
