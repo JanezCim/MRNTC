@@ -3,9 +3,18 @@
 #sources ROS. Add appropriate distro: source "/opt/ros/<DISTRO/setup.bash"
 source "/opt/ros/kinetic/setup.bash"
 
-#detects the IP of local machine (localhost does not always work)
-#This could cause problems if local machine has multiple network config setup
-ipv4=$(ip addr show |grep -w inet |tail -1 |awk '{ print $2}' | cut -d '/' -f 1)
+
+
+#############################FINDING THE LOCAL IP ADRESS (only one must be uncommented)##########################
+
+# Detects the IP of local machine (localhost does not always work)
+
+# This takes the last ip adress which could cause problems if local machine has multiple network config setup
+# ipv4=$(ip addr show |grep -w inet |tail -1 |awk '{ print $2}' | cut -d '/' -f 1)
+
+#This takes the IP adress that starts with 192
+ipv4=$(ip addr show |grep -w inet | grep -w 192 |awk '{ print $2}' | cut -d '/' -f 1)
+
 
 
 #############################master IP setup (only one of the following must be uncommented)####################################

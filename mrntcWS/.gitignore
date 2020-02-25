@@ -10,4 +10,5 @@ frames.pdf
 cartographer/
 cartographer_ros/
 ceres-solver/
+protobuf/
 .rosinstall*

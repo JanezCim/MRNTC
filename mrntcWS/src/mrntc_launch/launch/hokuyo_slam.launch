@@ -9,19 +9,22 @@
         <param name="occupancy_map_resolution" value="0.1" />
 	</node> -->
 
-  <node name="hokuyo" pkg="hokuyo_node" type="hokuyo_node" respawn="false" output="screen">
-
-    <!-- Starts up faster, but timestamps will be inaccurate. -->
-    <param name="calibrate_time" type="bool" value="false"/>
-
-    <!-- Set the port to connect to here -->
-    <param name="port" type="string" value="/dev/ttyACM1"/>
-
-    <param name="intensity" type="bool" value="false"/>
+  
+  <node name="urg_node" pkg="urg_node" type="urg_node" output="screen">
+    <param name="ip_address" value=""/>
+    <param name="serial_port" value="/dev/ttyACM1"/>
+    <param name="serial_baud" value="115200"/>
+    <param name="frame_id" value="laser"/>
+    <param name="calibrate_time" value="true"/>
+    <param name="publish_intensity" value="false"/>
+    <param name="publish_multiecho" value="false"/>
+    <param name="angle_min" value="-1.5707963"/>
+    <param name="angle_max" value="1.5707963"/>
   </node>
+  
 
 
-  <node name="cartographer_node" pkg="cartographer_ros"
+  <!-- <node name="cartographer_node" pkg="cartographer_ros"
     type="cartographer_node" 
     args="-configuration_directory $(find cartographer_ros)/configuration_files -configuration_basename pr2.lua"
     output="screen">
@@ -38,6 +41,6 @@
       - map
       - odom_combined
     </rosparam>
-  </node>
+  </node> -->
 
 </launch>
