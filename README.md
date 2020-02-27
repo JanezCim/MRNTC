@@ -4,7 +4,6 @@ ROS: Kinetic
 
 Linux: 16.04
 
-
 # To run cartographer mapping
 
 On test PC (every new terminal must be sourced in workspace and have ROS master ip setup):
@@ -14,4 +13,4 @@ On test PC (every new terminal must be sourced in workspace and have ROS master 
 
 On ref PC (every new terminal must be sourced in workspace and have ROS master ip setup):
 
-    roslaunch mrntc_ref_launch cartographer.launchroslaunch mrntc_ref_launch cartographer.launch
+    roslaunch mrntc_ref_launch cartographer.launch

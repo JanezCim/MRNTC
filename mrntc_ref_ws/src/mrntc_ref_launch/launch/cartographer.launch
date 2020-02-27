@@ -4,13 +4,6 @@
   <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0 0 0 0 0 0  /base_link /laser 10"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link_imu_broadcaster" args="0 0 0 0 0 0  /base_link /camera_imu_optical_frame 10"/>
 
-
-  <!-- <param name="robot_description"
-    textfile="$(find cartographer_ros)/urdf/backpack_2d.urdf" /> -->
-
-  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher"
-    type="robot_state_publisher" /> -->
-
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find mrntc_ref_launch)/configuration_files
