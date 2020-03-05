@@ -1,0 +1,11 @@
+<!-- Launches Hokuyo lidar and realsense drivers -->
+
+<launch>
+
+  <include file="$(find mrntc_test_launch)/launch/hokuyo.launch">
+  </include>
+
+
+  <include file="$(find mrntc_test_launch)/launch/rs_t265.launch"></include>
+
+</launch>
