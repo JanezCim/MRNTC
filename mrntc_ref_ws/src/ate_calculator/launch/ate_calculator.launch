@@ -1,0 +1,17 @@
+<launch>
+
+  <node name="ate_calculator" pkg="ate_calculator"
+      type="ate_calculator_node"
+      output="screen">
+    <!-- <remap from="reference_target_frame" to="base_footprint2" />
+    <remap from="reference_source_frame" to="map" /> -->
+
+    <param name="reference_source_frame" type="string" value="map" />
+    <param name="reference_target_frame" type="string" value="base_footprint2" />
+    
+    <param name="test_souce_frame" type="string" value="map" />
+    <param name="test_target_frame" type="string" value="base_footprint" />
+    
+  </node>
+
+</launch>
