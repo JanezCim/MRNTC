@@ -44,47 +44,45 @@ int main(int argc, char** argv){
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tfListener(tfBuffer);
 
-  //logging
-  // ofstream myfile("output.txt"); //src/ate_calculator/src/
-  
-  
-  // try{
-  //   myfile.open("output.txt", std::ios::trunc);
-  // }
-  // catch (const std::exception& e) {
-  //   ROS_WARN("error opening the logging file");
-  //   return 0;
-  // } 
-
+  // set the log file
   ofstream myfile(out_file.c_str());
 
+  // innit the vars used in the program
   string output_text;
   double dx, dy, dist_diff;
+  bool print_logging_msg = true;
 
   // main loop
   ros::Rate rate(10.0);
   while (node.ok()){
+    // Innit the transforms
     geometry_msgs::TransformStamped refTransform;
     geometry_msgs::TransformStamped testTransform;
+    
+    // get both transformations, if you dont get them, warn and skip loop
     try{
       refTransform = tfBuffer.lookupTransform(reference_target_frame, reference_source_frame, ros::Time(0)); //target_frame = child_frame, source_frame = parent_frame
     }
     catch (tf2::TransformException &ex) {
       ROS_WARN("%s",ex.what());
       ros::Duration(1.0).sleep();
+      print_logging_msg = true;
       continue;
     }
-
     try{
       testTransform = tfBuffer.lookupTransform(test_target_frame, test_source_frame, ros::Time(0)); //target_frame = child_frame, source_frame = parent_frame
     }
     catch (tf2::TransformException &ex) {
       ROS_WARN("%s",ex.what());
       ros::Duration(1.0).sleep();
+      print_logging_msg = true;
       continue;
     }
 
-    // ROS_INFO("TEST: x: %lf, y %lf", testTransform.transform.translation.x, testTransform.transform.translation.y);
+    if(print_logging_msg){
+      ROS_INFO("Got all transformations and logging now into %s ...", out_file.c_str());
+      print_logging_msg = false;
+    }
 
     // check the timestamp difference between the two messages
     ros::Duration diff=testTransform.header.stamp-refTransform.header.stamp;
