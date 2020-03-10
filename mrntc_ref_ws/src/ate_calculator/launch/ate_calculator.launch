@@ -10,8 +10,12 @@
     <param name="reference_target_frame" type="string" value="base_footprint2" />
     
     <param name="test_souce_frame" type="string" value="map" />
-    <param name="test_target_frame" type="string" value="base_footprint" />
+    <param name="test_target_frame" type="string" value="base_footprint2" />
+
+    <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
+    <param name="out_file_path" type="string" value=" $(find ate_calculator)/src/output.txt" />
     
+
   </node>
 
 </launch>
