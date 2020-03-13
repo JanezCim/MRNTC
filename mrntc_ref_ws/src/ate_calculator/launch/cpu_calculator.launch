@@ -1,0 +1,8 @@
+<launch>
+  <node name="cpu_calculator" pkg="ate_calculator"
+      type="cpu_calculator_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(find ate_calculator)/src/cpu_output.txt" />
+    <param name="frequency" type="double" value="5.0" /> 
+  </node>
+</launch>

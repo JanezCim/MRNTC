@@ -15,7 +15,7 @@ int main(int argc, char** argv){
   ros::NodeHandle node;
 
 
-  //#####################################PARAMS################################################################### 
+  //#####################################ROS PARAMS################################################################ 
   string reference_target_frame;
   string test_target_frame;
   string reference_source_frame;
@@ -29,7 +29,7 @@ int main(int argc, char** argv){
   node.param("/ate_calculator/timestamp_time_difference_thresh", timestamp_time_difference_thresh, 0.01);
 
   string out_file;
-  node.param<std::string>("/ate_calculator/out_file_path", out_file, "output.txt");
+  node.param<std::string>("/ate_calculator/out_file_path", out_file, "ate_output.txt");
  
   //#############################################################################################################
 

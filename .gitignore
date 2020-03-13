@@ -9,4 +9,5 @@ frames.gv
 frames.pdf
 youbot_setup.md
 *.bag
-output.txt
+*ate_output.txt
+*cpu_output.txt

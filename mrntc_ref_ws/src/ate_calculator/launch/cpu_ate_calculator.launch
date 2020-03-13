@@ -3,8 +3,6 @@
   <node name="ate_calculator" pkg="ate_calculator"
       type="ate_calculator_node"
       output="screen">
-    <!-- <remap from="reference_target_frame" to="base_footprint2" />
-    <remap from="reference_source_frame" to="map" /> -->
 
     <param name="reference_source_frame" type="string" value="map" />
     <param name="reference_target_frame" type="string" value="base_footprint2" />
@@ -17,4 +15,12 @@
     
 
   </node>
+
+  <node name="cpu_calculator" pkg="ate_calculator"
+      type="cpu_calculator_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(find ate_calculator)/src/cpu_output.txt" />
+    <param name="frequency" type="double" value="5.0" /> 
+  </node>
+
 </launch>
