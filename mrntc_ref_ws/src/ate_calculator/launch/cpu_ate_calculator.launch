@@ -12,8 +12,6 @@
 
     <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
     <param name="out_file_path" type="string" value=" $(find ate_calculator)/src/output.txt" />
-    
-
   </node>
 
   <node name="cpu_calculator" pkg="ate_calculator"

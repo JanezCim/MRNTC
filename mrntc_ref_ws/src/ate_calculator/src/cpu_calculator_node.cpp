@@ -66,15 +66,5 @@ int main(int argc, char** argv) {
     previous_total_time = total_time;
     rate.sleep();
   }
-
-
-  // for (size_t idle_time, total_time; get_cpu_times(idle_time, total_time); sleep(1)) {
-  //     const float idle_time_delta = idle_time - previous_idle_time;
-  //     const float total_time_delta = total_time - previous_total_time;
-  //     const float utilization = 100.0 * (1.0 - idle_time_delta / total_time_delta);
-  //     std::cout << utilization << '%' << std::endl;
-  //     previous_idle_time = idle_time;
-  //     previous_total_time = total_time;
-  // }
   return 0;
 }
