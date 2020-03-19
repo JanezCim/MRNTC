@@ -6,7 +6,7 @@
   <!-- //////////////////////////////////////////////////////////// -->
 
   <!-- launch turtlebot in a world with QR codes -->
-  <include file="$(find turtlebot_gazebo)/launch/turtlebot_world.launch">
+  <include file="$(find mrntc_ref_launch)/launch/turtlebot_world.launch">
      <arg name="world_file"  value="$(find mrntc_ref_launch)/configuration_files/gazebo_aruco.world"/>
   </include>
 
