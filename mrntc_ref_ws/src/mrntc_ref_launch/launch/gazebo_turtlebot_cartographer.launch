@@ -1,0 +1,23 @@
+<!-- Launches gazebo world with set QR pannels, inserts turtlebot and runns aruco slam -->
+<launch>
+  <arg name="imu_topic" default="/mobile_base/sensors/imu_data"/>
+
+
+  <!-- launch turtlebot in a world with QR codes -->
+  <include file="$(find mrntc_ref_launch)/launch/turtlebot_world.launch">
+     <arg name="world_file"  value="$(find mrntc_ref_launch)/configuration_files/gazebo_aruco.world"/>
+  </include>
+
+  <node name="cartographer_node" pkg="cartographer_ros"
+      type="cartographer_node" args="
+          -configuration_directory $(find mrntc_ref_launch)/configuration_files
+          -configuration_basename cartographer_turtlebot.lua"
+      output="screen">
+    <remap from="echoes" to="horizontal_laser_2d" />
+    <remap from="imu" to="$(arg imu_topic)" />
+  </node>
+
+  <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
+      type="cartographer_occupancy_grid_node" args="-resolution 0.05" />
+
+</launch>
