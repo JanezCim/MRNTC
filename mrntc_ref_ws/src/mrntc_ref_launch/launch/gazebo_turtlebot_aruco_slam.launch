@@ -7,33 +7,33 @@
 
   <!-- launch turtlebot in a world with QR codes -->
   <include file="$(find mrntc_ref_launch)/launch/turtlebot_world.launch">
-     <arg name="world_file"  value="$(find mrntc_ref_launch)/configuration_files/gazebo_aruco.world"/>
+     <arg name="world_file"  value= "/home/janez/aruco_gazebo.world"/> <!-- "$(find mrntc_ref_launch)/configuration_files/gazebo_aruco.world"/> -->
   </include>
 
   <!-- aruco marker detection with parameters set for turtlebot -->
-  <!-- <include file="$(find mrntc_ref_launch)/launch/aruco_detect.launch">
+  <include file="$(find mrntc_ref_launch)/launch/aruco_detect.launch">
     <arg name="camera"  value="/camera/rgb"/>
     <arg name="image" value="image_raw"/>
     <arg name="transport" value="compressed"/>
     <arg name="fiducial_len" value="$(arg fiducial_len)"/>
     <arg name="dictionary" value="7"/>
     <arg name="do_pose_estimation" value="true"/>
-  </include> -->
+  </include>
 
   <!-- aruco marker slam with parameters set for turtlebot -->
-  <!-- <include file="$(find mrntc_ref_launch)/launch/fiducial_slam.launch">
+  <include file="$(find mrntc_ref_launch)/launch/fiducial_slam.launch">
     <arg name="camera" value="/camera/rgb"/>
     <arg name="map_frame" value="map"/>
     <arg name="odom_frame" value="odom"/>
     <arg name="base_frame" value="base_footprint"/>
-    <arg name="publish_tf" value="true"/>
+    <arg name="publish_tf" value="false"/>
     <arg name="tf_publish_interval" value="0.2"/>
     <arg name="future_date_transforms" value="0.0"/>
     <arg name="publish_6dof_pose" value="false"/>
     <arg name="fiducial_len" value="$(arg fiducial_len)"/>
     <arg name="systematic_error" value="0.01"/>
-    <arg name="do_pose_estimation" value="false"/>
+    <arg name="do_pose_estimation" value="true"/>
     <arg name="covariance_diagonal" value="[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
-  </include> -->
+  </include>
 
 </launch>
