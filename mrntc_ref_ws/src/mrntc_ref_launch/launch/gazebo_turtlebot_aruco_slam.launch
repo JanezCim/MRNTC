@@ -26,7 +26,7 @@
     <arg name="map_frame" value="map"/>
     <arg name="odom_frame" value="odom"/>
     <arg name="base_frame" value="base_footprint"/>
-    <arg name="publish_tf" value="false"/>
+    <arg name="publish_tf" value="false"/>    <!--true for standalone operation, false for operation with robot_localisation-->
     <arg name="tf_publish_interval" value="0.2"/>
     <arg name="future_date_transforms" value="0.0"/>
     <arg name="publish_6dof_pose" value="false"/>
