@@ -14,6 +14,18 @@ All the files neceserry to run cartographer are contained within this workspace,
 ## Rtabmap
 
     sudo apt install ros-kinetic-rtabmap
+    sudo apt install ros-kinetic-rtabmap-ros
+
+## Realsense drivers
+
+    sudo apt install ros-kinetic-realsense2-camera
+    sudo apt install ros-kinetic-realsense2-description
+
+and for the usb permission
+
+    git clone https://github.com/IntelRealSense/librealsense.git
+    cd librealsense/
+    ./scripts/setup_udev_rules.sh
 
 ## Aruco Detect, fiducials
 
@@ -41,7 +53,9 @@ To launch the turtlebot in the mrntc world, use this command
 
 4. Open Rviz and visualise the results
 
+# LAUNCHING RTABMAP 3D MAPPING WITH REALSENSE D435i
 
+    roslaunch mrntc_ref_launch rtabmap.launch
 
 
 # DEVELOPER NOTES

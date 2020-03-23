@@ -1,0 +1,22 @@
+<launch>
+  <!-- Sets the name for tf and namespaces -->
+  <arg name="camera_name"               default="camera"/> 
+
+  <!-- Choose visualisation -->
+  <arg name="use_rviz"                  default="true"/>
+  <arg name="use_rtabmapviz"            default="false"/>
+
+  <!-- Launch the realsense driver-->
+  <include file="$(find mrntc_ref_launch)/launch/realsense/rs_d435i.launch">
+    <arg name="camera"            value="$(arg camera_name)"/>
+  </include>
+
+  <!-- Launch the rtabmapping for one camera with correct remapping and parameters -->
+  <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+    <arg name="rtabmap_args"       value="--delete_db_on_start"/>
+    <arg name="depth_topic"        value="/$(arg camera_name)/aligned_depth_to_color/image_raw"/>
+    <arg name="rgb_topic"          value="/$(arg camera_name)/color/image_raw"/>
+    <arg name="camera_info_topic"  value="/$(arg camera_name)/color/camera_info"/>
+    <arg name="approx_sync"        value="false"/>
+  </include>
+</launch>

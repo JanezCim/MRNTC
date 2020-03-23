@@ -1,5 +1,5 @@
 <launch>
-  <arg name="serial_no"           default="925622070776"/>
+  <arg name="serial_no"           default=""/>
   <arg name="usb_port_id"         default=""/>
   <arg name="device_type"         default="d435i"/>
   <arg name="json_file_path"      default=""/>
@@ -39,8 +39,8 @@
   <arg name="pointcloud_texture_index"  default="0"/>
 
   <arg name="enable_sync"               default="false"/>
-  <arg name="align_depth"               default="false"/>
-
+  <arg name="align_depth"               default="true"/> <!--false-->
+ 
   <arg name="publish_tf"                default="true"/>
   <arg name="tf_publish_rate"           default="0"/>
 
