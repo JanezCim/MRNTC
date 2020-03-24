@@ -59,7 +59,6 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <depend>aruco_detect</depend>
-  <depend>turtlebot</depend>
   <depend>robot_localization</depend>
 
 
