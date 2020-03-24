@@ -203,7 +203,7 @@
       </joint>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>0.773487 -0.802487 0 0 -0 0</pose>
+      <pose frame=''>0.074072 1.13775 0 0 -0 0</pose>
     </model>
     <model name='aruco_visual_marker_2'>
       <link name='marker'>
@@ -328,7 +328,7 @@
       </joint>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>0.749945 -0.533714 0 0 -0 0</pose>
+      <pose frame=''>-0.278576 1.12427 0 0 -0 0</pose>
     </model>
     <model name='aruco_visual_marker_3'>
       <link name='marker'>
@@ -453,7 +453,7 @@
       </joint>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>0.745108 -0.350918 0 0 -0 0</pose>
+      <pose frame=''>-0.711337 1.13388 0 0 -0 0</pose>
     </model>
     <model name='aruco_visual_marker_4'>
       <link name='marker'>
@@ -578,7 +578,7 @@
       </joint>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>0.742445 -0.164443 0 0 -0 0</pose>
+      <pose frame=''>-1.14457 1.14351 0 0 -0 0</pose>
     </model>
     <model name='aruco_visual_marker_5'>
       <link name='marker'>
@@ -703,7 +703,7 @@
       </joint>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>0.738799 0.037987 0 0 -0 0</pose>
+      <pose frame=''>-1.38444 0.673729 0 0 -0 0</pose>
     </model>
     <model name='aruco_visual_marker_6'>
       <link name='marker'>
@@ -828,7 +828,7 @@
       </joint>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>0.730523 0.225485 0 0 -0 0</pose>
+      <pose frame=''>-1.39877 -0.205842 0 0 -0 0</pose>
     </model>
     <model name='aruco_visual_marker_7'>
       <link name='marker'>
@@ -953,120 +953,120 @@
       </joint>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>0.736721 0.42031 0 0 -0 0</pose>
+      <pose frame=''>-0.811895 -0.491064 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>141 239000000</sim_time>
-      <real_time>141 841017119</real_time>
-      <wall_time>1584456683 408293589</wall_time>
-      <iterations>141239</iterations>
+      <sim_time>997 387000000</sim_time>
+      <real_time>1000 219542930</real_time>
+      <wall_time>1584783945 254493044</wall_time>
+      <iterations>997387</iterations>
       <model name='aruco_visual_marker_1'>
-        <pose frame=''>1.66677 -1.6141 0.342649 -1.55484 -0.006615 0.392963</pose>
+        <pose frame=''>0.074072 1.13752 0.298496 1.57156 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='marker'>
-          <pose frame=''>1.66677 -1.6141 0.342649 -1.55484 -0.006615 0.392963</pose>
+          <pose frame=''>0.074072 1.13752 0.298496 1.57156 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='marker_pad'>
-          <pose frame=''>1.66678 -1.61411 0.342648 -1.55484 -0.006615 0.392963</pose>
+          <pose frame=''>0.074072 1.13753 0.298496 1.57156 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='aruco_visual_marker_2'>
-        <pose frame=''>0.749945 -1.60484 0.609933 -1.76171 0 0</pose>
+        <pose frame=''>-0.278576 1.12393 0.307382 1.57191 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='marker'>
-          <pose frame=''>0.749945 -1.60484 0.609933 -1.76171 0 0</pose>
+          <pose frame=''>-0.278576 1.12393 0.307382 1.57191 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='marker_pad'>
-          <pose frame=''>0.749945 -1.60485 0.609935 -1.76171 0 0</pose>
+          <pose frame=''>-0.278576 1.12394 0.307382 1.57191 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='aruco_visual_marker_3'>
-        <pose frame=''>1.48624 0.884572 0.338902 -2.4192 -1.42805 -3.14159</pose>
+        <pose frame=''>-0.711337 1.83655 0.184507 1.56779 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='marker'>
-          <pose frame=''>1.48624 0.884572 0.338902 -2.4192 -1.42805 -3.14159</pose>
+          <pose frame=''>-0.711337 1.83655 0.184507 1.56779 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='marker_pad'>
-          <pose frame=''>1.48625 0.884579 0.338903 -2.4192 -1.42805 -3.14159</pose>
+          <pose frame=''>-0.711337 1.83656 0.184507 1.56779 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='aruco_visual_marker_4'>
-        <pose frame=''>1.69808 -0.851159 0.640358 -2.78592 -1.03581 3.14159</pose>
+        <pose frame=''>-1.17245 1.10825 0.311387 1.57508 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='marker'>
-          <pose frame=''>1.69808 -0.851159 0.640358 -2.78592 -1.03581 3.14159</pose>
+          <pose frame=''>-1.17245 1.10825 0.311387 1.57508 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='marker_pad'>
-          <pose frame=''>1.69808 -0.851155 0.640363 -2.78592 -1.03581 3.14159</pose>
+          <pose frame=''>-1.17245 1.10826 0.311387 1.57508 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='aruco_visual_marker_5'>
-        <pose frame=''>2.08716 0.037987 0.189471 3.14159 -1.43651 3.14159</pose>
+        <pose frame=''>-1.38856 0.679826 0.286447 0 1.56803 0</pose>
         <scale>1 1 1</scale>
         <link name='marker'>
-          <pose frame=''>2.08716 0.037987 0.189471 3.14159 -1.43651 3.14159</pose>
+          <pose frame=''>-1.38856 0.679826 0.286447 0 1.56803 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='marker_pad'>
-          <pose frame=''>2.08717 0.037987 0.189472 3.14159 -1.43651 3.14159</pose>
+          <pose frame=''>-1.38857 0.679826 0.286447 0 1.56803 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='aruco_visual_marker_6'>
-        <pose frame=''>1.13758 1.2653 0.669992 1.65064 0.067131 -0.697675</pose>
+        <pose frame=''>-1.39923 -0.205842 0.336149 0 1.56943 0</pose>
         <scale>1 1 1</scale>
         <link name='marker'>
-          <pose frame=''>1.13758 1.2653 0.669992 1.65064 0.067131 -0.697675</pose>
+          <pose frame=''>-1.39923 -0.205842 0.336149 0 1.56943 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='marker_pad'>
-          <pose frame=''>1.13759 1.26531 0.669993 1.65064 0.067131 -0.697675</pose>
+          <pose frame=''>-1.39924 -0.205842 0.336149 0 1.56943 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='aruco_visual_marker_7'>
-        <pose frame=''>-0.378295 0.820839 0.321697 1.87145 -0 0</pose>
+        <pose frame=''>-0.811895 -1.03872 0.383029 -1.56934 0 0</pose>
         <scale>1 1 1</scale>
         <link name='marker'>
-          <pose frame=''>-0.378295 0.820839 0.321697 1.87145 -0 0</pose>
+          <pose frame=''>-0.811895 -1.03872 0.383029 -1.56934 0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='marker_pad'>
-          <pose frame=''>-0.378295 0.820848 0.3217 1.87145 -0 0</pose>
+          <pose frame=''>-0.811895 -1.03873 0.383029 -1.56934 0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -1088,7 +1088,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>-2.62448 -2.45065 3.64686 0 0.785796 0.480195</pose>
+        <pose frame=''>-0.569437 -1.86946 3.30739 0 1.03164 1.4282</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

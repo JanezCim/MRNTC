@@ -7,7 +7,7 @@
 
   <!-- launch turtlebot in a world with QR codes -->
   <include file="$(find mrntc_ref_launch)/launch/turtlebot_world.launch">
-    <arg name="world_file"  value= "/home/janez/aruco_gazebo.world"/> <!-- "$(find mrntc_ref_launch)/configuration_files/gazebo_aruco.world"/> -->
+    <arg name="world_file"  value= "$(find mrntc_ref_launch)/configuration_files/gazebo_aruco.world"/>
   </include>
 
   <!-- aruco marker detection with parameters set for turtlebot -->
