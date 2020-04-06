@@ -46,7 +46,9 @@ To launch the turtlebot in the mrntc world, use this command
 
     roslaunch turtlebot_gazebo turtlebot_world.launch world_file:="<ABSOLUTE_PATH_TO_WORKSPACE>/src/mrntc_ref_launch/configuration_files/gazebo_aruco.world"
 
+## YDlidar
 
+Followed official tutorial https://github.com/EAIBOT/ydlidar
 
 # DEVELOPER NOTES (things I found usefull during development)
 
