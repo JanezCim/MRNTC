@@ -17,6 +17,7 @@ All the files neceserry to run cartographer are contained within this workspace,
     sudo apt install ros-kinetic-rtabmap-ros
 
 ## Realsense drivers
+REALSENSE CAMERA HAS TO BE PLUGGED INTO USB 3.0 PORT OTHERWISE IT CAN START DOING SOME WIERD STUFF
 
     sudo apt install ros-kinetic-realsense2-camera
     sudo apt install ros-kinetic-realsense2-description

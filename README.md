@@ -4,6 +4,10 @@ ROS: Kinetic
 
 Linux: 16.04
 
+# To run the motor driver
+
+    ydriver
+
 # To run cartographer mapping
 
 On test PC (every new terminal must be sourced in workspace and have ROS master ip setup):
