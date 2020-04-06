@@ -41,7 +41,7 @@
   <arg name="enable_sync"               default="false"/>
   <arg name="align_depth"               default="true"/> <!--false-->
  
-  <arg name="publish_tf"                default="false"/> <!-- set to false because we provide tf elsewhere-->
+  <arg name="publish_tf"                default="false"/> <!-- set to false because we provide tf elsewhere-->LAUNCHING RTABMAP 3D MAPPING WITH REALSENSE D435i
   <arg name="tf_publish_rate"           default="0"/>
 
   <arg name="filters"                   default=""/>

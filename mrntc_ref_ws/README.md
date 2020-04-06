@@ -7,27 +7,29 @@ This workspace is ment to be uploaded and compiled on the reference PC. In the R
 
 ## Cartographer
 
-Followed the official tutorial of instalation: https://google-cartographer-ros.readthedocs.io/en/latest/compilation.html
-[When compiling the protobuf, the git repo was not accesable from robot (probably because of bad internet connection - it had to be cloned to a PC and then transfered to the robot via sftp)]
-All the files neceserry to run cartographer are contained within this workspace, so the only thin needed is to compile it.
+    Followed the official tutorial of instalation: https://google-cartographer-ros.readthedocs.io/en/latest/compilation.html
+    [When compiling the protobuf, the git repo was not accesable from robot (probably because of bad internet connection - it had to be cloned to a PC and then transfered to the robot via sftp)]
+    All the files neceserry to run cartographer are contained within this workspace, so the only thin needed is to compile it.
 
-## Rtabmap
-
-    sudo apt install ros-kinetic-rtabmap
-    sudo apt install ros-kinetic-rtabmap-ros
-
-## Realsense drivers
+## Realsense driver
 REALSENSE CAMERA HAS TO BE PLUGGED INTO USB 3.0 PORT OTHERWISE IT CAN START DOING SOME WIERD STUFF
 
-    sudo apt install ros-kinetic-realsense2-camera
-    sudo apt install ros-kinetic-realsense2-description
+1. FROM SOURCE (prefered and used in this project):
 
-and for the usb permission
+    Followed official tutorial on https://github.com/IntelRealSense/realsense-ros
+    (17.7.2019) \ Istalling librealsense (Step 1 on the Realsense Github), HAS TO BE DONE from source and not from Debian package! When following instructions how to build from source (https://github.com/IntelRealSense/librealsense/blob/master/doc/installation.md), checkout to development branch before building (Building librealsense2 SDK Step). Why is that is described here (https://github.com/IntelRealSense/realsense-ros/issues/703#issuecomment-483666317)
 
-    cd
-    git clone https://github.com/IntelRealSense/librealsense.git
-    cd librealsense/
-    ./scripts/setup_udev_rules.sh
+
+2. INSTALLING WITH APT:
+
+        sudo apt install ros-kinetic-realsense2-camera
+        sudo apt install ros-kinetic-realsense2-description
+
+    and for the usb permission
+
+        git clone https://github.com/IntelRealSense/librealsense.git
+        cd librealsense/
+        ./scripts/setup_udev_rules.sh
 
 ## Aruco Detect, fiducials
 
@@ -45,9 +47,10 @@ To launch the turtlebot in the mrntc world, use this command
     roslaunch turtlebot_gazebo turtlebot_world.launch world_file:="<ABSOLUTE_PATH_TO_WORKSPACE>/src/mrntc_ref_launch/configuration_files/gazebo_aruco.world"
 
 
-# REFERENCE PC RUN
 
-## RUNNING SIMULATION OF ARUCO SLAM IN GAZEBO
+# DEVELOPER NOTES (things I found usefull during development)
+
+## 1. RUNNING SIMULATION OF ARUCO SLAM IN GAZEBO
 
 1. Copy aruco markers (the content of the file Aruco Markers from this repo) and paste them into ~/.gazebo/models
 
@@ -57,16 +60,15 @@ To launch the turtlebot in the mrntc world, use this command
 
 4. Open Rviz and visualise the results
 
-## LAUNCHING RTABMAP 3D MAPPING WITH REALSENSE D435i
+## 2. LAUNCHING RTABMAP 3D MAPPING WITH REALSENSE D435i
 
-    roslaunch mrntc_ref_launch rtabmap.launch
+        roslaunch mrntc_ref_launch rtabmap.launch
 
-
-# DEVELOPER NOTES (things I found usefull during development)
-
-1. Whenever using sim time, be sure you start with --clock parameter
+Whenever using sim time, be sure you start with --clock parameter
 
         rosbag play *.bag --clock
+
+## 3. General notes
 
 1. The whole space has to be built with a catkin_make_isolated because cartographer package is not standard
 
