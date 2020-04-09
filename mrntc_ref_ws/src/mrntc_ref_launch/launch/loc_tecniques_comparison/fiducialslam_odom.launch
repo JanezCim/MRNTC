@@ -1,0 +1,102 @@
+<!-- Launches filtered bag with transforms to camera, fiducial slam fused with odometry -->
+
+<launch>
+
+  <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+  <arg name="bag_path"/>
+
+  <arg name="image_topic" default="/camera/color/image_raw"/>
+  <arg name="camera_info_topic" default="/camera/color/camera_info"/>
+  <arg name="map_frame" default="map"/>
+  <arg name="odom_frame" default="odom_test"/>
+  <arg name="base_frame" default="camera_link"/>
+
+
+  <arg name="transport" default="raw"/> <!-- options: (raw, theora, compressed)-->
+  <!-- there is an error in the default library, where if you change the "transport"
+  parameter, the name of the topic for image input changes, so when you remap
+  you have to change this as well...
+  TLDR: change "default_image_topic" parameter here to:
+     - "/camera/" if transport topic is set to "raw"
+     - "/camera/theora" if transport topic is set to "theora"
+     - "/camera/compressed" if transport topic is set to "compressed"-->
+  <arg name="default_image_topic" default="/camera"/> 
+
+  <arg name="fiducial_len" default="0.14"/>
+  <arg name="dictionary" default="7"/>
+  <arg name="do_pose_estimation" default="true"/>
+
+  <arg name="ignore_fiducials" default="" />
+  <arg name="fiducial_len_override" default="" />
+  <arg name="publish_tf" default="true"/>   <!--true for standalone operation, false for operation with robot_localisation-->
+  <arg name="tf_publish_interval" default="0.2"/>
+  <arg name="future_date_transforms" default="0.0"/>
+  <arg name="publish_6dof_pose" default="false"/>
+  <arg name="systematic_error" default="0.01"/>
+  <arg name="covariance_diagonal" default="[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
+
+  <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+  <param name="/use_sim_time" type="bool" value="true"/>
+
+  <!-- rosbag start with clock parameter -->
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l $(arg bag_path)"/>
+
+  <!-- Static publishers of base_footprint->base_link->camera_link transforms -->
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_test /base_link 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_link /camera_link 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 /map /odom 10"/>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="map_odom_test_broadcaster" args="0 0 0 0 0 0 /map /odom_test 10"/> -->
+  
+  <!-- aruco detection -->
+  <node pkg="aruco_detect" name="aruco_detect"
+    type="aruco_detect" output="screen" required="true">
+    <param name="image_transport" value="$(arg transport)"/>
+    <param name="publish_images" value="true" />
+    <param name="fiducial_len" value="$(arg fiducial_len)"/>
+    <param name="dictionary" value="$(arg dictionary)"/>
+    <param name="do_pose_estimation" value="$(arg do_pose_estimation)"/>
+    <param name="ignore_fiducials" value="$(arg ignore_fiducials)"/>
+    <param name="fiducial_len_override" value="$(arg fiducial_len_override)"/>
+    <remap from="$(arg default_image_topic)" to="$(arg image_topic)"/>
+    <remap from="/camera_info" to="$(arg camera_info_topic)"/>
+  </node>
+
+  <!-- fiducial slam -->
+  <node type="fiducial_slam" pkg="fiducial_slam" output="screen" 
+    name="fiducial_slam" required="true">
+    <param name="map_file" value="$(env HOME)/.ros/slam/map.txt" />
+    <param name="map_frame" value="$(arg map_frame)" />
+    <param name="odom_frame" value="$(arg odom_frame)" />
+    <param name="base_frame" value="$(arg base_frame)" />
+    <param name="publish_tf" value="$(arg publish_tf)" />
+    <param name="tf_publish_interval" value="$(arg tf_publish_interval)" />
+    <param name="future_date_transforms" value="$(arg future_date_transforms)" />
+    <param name="publish_6dof_pose" value="$(arg publish_6dof_pose)" />
+    <param name="do_pose_estimation" value="$(arg do_pose_estimation)"/>
+    <param name="sum_error_in_quadrature" value="true"/>
+    <param name="fiducial_len" value="$(arg fiducial_len)"/>
+    <param name="covariance_diagonal" value="$(arg covariance_diagonal)"/>
+    <remap from="/camera_info" to="$(arg camera_info_topic)"/>
+  </node>
+
+  <!-- clone and rename tre transform for test odom -->
+  <node name="tf_clone_renamer" pkg="ate_calculator" type="tf_clone_rename" output="screen" required="true">
+    <param name="input_parent_frame" type="string" value="odom" />
+    <param name="input_child_frame" type="string" value="base_footprint" />
+    
+    <param name="output_parent_frame" type="string" value="$(arg odom_frame)" />
+    <param name="output_child_frame" type="string" value="base_footprint_test" />
+  </node>
+
+
+  <!-- robot localisation parameters and node -->
+  <!-- <rosparam command="load" file="$(find mrntc_ref_launch)/configuration_files/robot_localisation/fiducialslam_odom.yaml" />
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true" output="screen" /> -->
+
+  
+
+
+</launch>

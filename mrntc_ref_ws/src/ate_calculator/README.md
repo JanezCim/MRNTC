@@ -8,7 +8,11 @@ Package also includes cpu calculator that gets CPU usage and writes it to a file
 
 ## Process of filtering out only the necesarry frames from the bag file
 
-The result of these two commands is that only map->odom->base_footprint2 transforms exsist
+### 1. Using the rosbag_editor (this was actually used)
+
+Instalation guide: https://github.com/facontidavide/rosbag_editor
+
+### 2. Using rosbag_filter (everything did not quite work)
 
 Deletes the frame base_footprint from the tf topic
 
@@ -29,3 +33,8 @@ Split bag file (greater-than-or-equal-to (>=) and less-than-or-qual-to (<=) oper
 Renaming the tf topic inside bag
 
     rosrun rosbag topic_renamer.py <in topic> <in bag> <out topic> <out bag>
+
+
+    rosbag filter input.bag output.bag "topic != '/tf' or ((len(m.transforms)>0 and m.transforms[0].header.frame_id=='odom') and (len(m.transforms) <= 1 or (len(m.transforms) > 1 and m.transforms[1].header.frame_id = 'odom')))"
+
+    rosbag filter original.bag filtered.bag "topic != '/tf' or ((len(m.transforms) > 0 and m.transforms[0].header.frame_id != 'odom') and (len(m.transforms) <= 1 or (len(m.transforms) > 1 and m.transforms[1].header.frame_id != 'odom')) and (len(m.transforms) <= 2 or (len(m.transforms) > 2 and m.transforms[2].header.frame_id != 'odom')) and (len(m.transforms) <= 3 or (len(m.transforms) > 3 and m.transforms[3].header.frame_id != 'odom')) and (len(m.transforms) <= 4 or (len(m.transforms) > 4 and m.transforms[4].header.frame_id != 'odom')))"
