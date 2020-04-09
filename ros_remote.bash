@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #sources ROS. Add appropriate distro: source "/opt/ros/<DISTRO/setup.bash"
-source "/opt/ros/kinetic/setup.bash"
+#source "/opt/ros/kinetic/setup.bash"
 
 #############################FINDING THE LOCAL IP ADRESS (only one must be uncommented)##########################
 

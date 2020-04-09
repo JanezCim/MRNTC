@@ -17,4 +17,13 @@
   <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
       type="cartographer_occupancy_grid_node" args="-resolution 0.05" />
 
+
+  <node name="tf_clone_renamer" pkg="ate_calculator" type="tf_clone_rename" output="screen" required="true">
+    <param name="input_parent_frame" type="string" value="odom" />
+    <param name="input_child_frame" type="string" value="base_footprint2" />
+    
+    <param name="output_parent_frame" type="string" value="map" />
+    <param name="output_child_frame" type="string" value="base_footprint_cartographer" />
+  </node>
+
 </launch>

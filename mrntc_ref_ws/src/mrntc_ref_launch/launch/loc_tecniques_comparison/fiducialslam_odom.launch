@@ -8,8 +8,8 @@
   <arg name="image_topic" default="/camera/color/image_raw"/>
   <arg name="camera_info_topic" default="/camera/color/camera_info"/>
   <arg name="map_frame" default="map"/>
-  <arg name="odom_frame" default="odom_test"/>
-  <arg name="base_frame" default="camera_link"/>
+  <arg name="odom_frame" default="odom"/>
+  <arg name="base_frame" default="odom"/>
 
 
   <arg name="transport" default="raw"/> <!-- options: (raw, theora, compressed)-->
@@ -23,9 +23,8 @@
   <arg name="default_image_topic" default="/camera"/> 
 
   <arg name="fiducial_len" default="0.14"/>
-  <arg name="dictionary" default="7"/>
+  <arg name="dictionary" default=""/>
   <arg name="do_pose_estimation" default="true"/>
-
   <arg name="ignore_fiducials" default="" />
   <arg name="fiducial_len_override" default="" />
   <arg name="publish_tf" default="true"/>   <!--true for standalone operation, false for operation with robot_localisation-->
@@ -43,13 +42,13 @@
   <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l $(arg bag_path)"/>
 
   <!-- Static publishers of base_footprint->base_link->camera_link transforms -->
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_test /base_link 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint /base_link 10"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_link /camera_link 10"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/>
   <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 10"/>
-  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 /map /odom 10"/>
-  <!-- <node pkg="tf" type="static_transform_publisher" name="map_odom_test_broadcaster" args="0 0 0 0 0 0 /map /odom_test 10"/> -->
-  
+  <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint_cartographer /laser 10"/>
+
+
   <!-- aruco detection -->
   <node pkg="aruco_detect" name="aruco_detect"
     type="aruco_detect" output="screen" required="true">
@@ -80,15 +79,6 @@
     <param name="fiducial_len" value="$(arg fiducial_len)"/>
     <param name="covariance_diagonal" value="$(arg covariance_diagonal)"/>
     <remap from="/camera_info" to="$(arg camera_info_topic)"/>
-  </node>
-
-  <!-- clone and rename tre transform for test odom -->
-  <node name="tf_clone_renamer" pkg="ate_calculator" type="tf_clone_rename" output="screen" required="true">
-    <param name="input_parent_frame" type="string" value="odom" />
-    <param name="input_child_frame" type="string" value="base_footprint" />
-    
-    <param name="output_parent_frame" type="string" value="$(arg odom_frame)" />
-    <param name="output_child_frame" type="string" value="base_footprint_test" />
   </node>
 
 
