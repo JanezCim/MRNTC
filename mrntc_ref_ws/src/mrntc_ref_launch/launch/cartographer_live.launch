@@ -2,13 +2,13 @@
 
 <launch>
   <!-- <param name="/use_sim_time" type="bool" value="true"/> -->
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0 0 0 0 0 0  /base_footprint2 /base_link 10"/>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0 0 0 0 0 0  /base_footprint2 /base_link 10"/> -->
 
   
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find mrntc_ref_launch)/configuration_files
-          -configuration_basename cartographer_youbot.lua"
+          -configuration_basename cartographer_youbot_live.lua"
       output="screen">
     <remap from="echoes" to="horizontal_laser_2d" />
     <remap from="imu" to="camera/imu" />
@@ -19,11 +19,11 @@
 
 
   <node name="tf_clone_renamer" pkg="ate_calculator" type="tf_clone_rename" output="screen" required="true">
-    <param name="input_parent_frame" type="string" value="odom" />
-    <param name="input_child_frame" type="string" value="base_footprint2" />
+    <param name="input_parent_frame" type="string" value="map" />
+    <param name="input_child_frame" type="string" value="base_footprint" />
     
     <param name="output_parent_frame" type="string" value="map" />
-    <param name="output_child_frame" type="string" value="base_footprint_cartographer" />
+    <param name="output_child_frame" type="string" value="base_footprint_ref" />
   </node>
 
 </launch>

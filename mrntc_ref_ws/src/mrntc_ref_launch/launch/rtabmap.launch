@@ -1,15 +1,18 @@
 <launch>
+  <!-- <param name="/use_sim_time" type="bool" value="true"/> -->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_footprint /camera_link 10"/>
+
   <!-- Sets the name for tf and namespaces -->
   <arg name="camera_name"               default="camera"/> 
 
   <!-- Choose visualisation -->
-  <arg name="use_rviz"                  default="true"/>
+  <arg name="use_rviz"                  default="false"/>
   <arg name="use_rtabmapviz"            default="false"/>
 
   <!-- Launch the realsense driver-->
-  <include file="$(find mrntc_ref_launch)/launch/realsense/rs_d435i.launch">
+  <!-- <include file="$(find mrntc_ref_launch)/launch/realsense/rs_d435i.launch">
     <arg name="camera"            value="$(arg camera_name)"/>
-  </include>
+  </include> -->
 
   <!-- Launch the rtabmapping for one camera with correct remapping and parameters -->
   <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
@@ -17,6 +20,6 @@
     <arg name="depth_topic"        value="/$(arg camera_name)/aligned_depth_to_color/image_raw"/>
     <arg name="rgb_topic"          value="/$(arg camera_name)/color/image_raw"/>
     <arg name="camera_info_topic"  value="/$(arg camera_name)/color/camera_info"/>
-    <arg name="approx_sync"        value="false"/>
+    <arg name="approx_sync"        value="true"/> <!-- false -->
   </include>
 </launch>
