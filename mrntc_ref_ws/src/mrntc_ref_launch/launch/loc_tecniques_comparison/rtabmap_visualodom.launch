@@ -1,0 +1,115 @@
+<launch>
+
+  <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+  <arg name="bag_path"/>
+
+  <arg name="frame_id"                  default="base_footprint_rtabmap"/>    <!--child frame of published visual odometry-->
+  <arg name="rgb_image_topic"           default="/camera/color/image_raw"/>   
+  <arg name="depth_image_topic"         default="/camera/aligned_depth_to_color/image_raw"/>
+  <arg name="camera_info_topic"         default="/camera/color/camera_info"/>
+  <arg name="odom_topic"                default="/rtabmap/odom"/>       <!--topic that rtabmap map maker subscribes to as odometry source (/odom for wheel and /rtabmap/odom for visual odometry) -->
+
+  <arg name="rviz"                      default="true"/>
+  <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/src/rtabmap_visualodom_cpu_output.txt"/>
+  <arg name="ate_output_file_path"      default="$(find ate_calculator)/src/rtabmap_visualodom_ate_output.txt"/>
+  <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+
+  <param name="/use_sim_time" type="bool" value="true"/>
+
+  <!-- rosbag start with clock parameter -->
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint2_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_rtabmap /base_link 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 10"/> <!--TODO remove-->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/>
+
+  <group ns="rtabmap">
+    <!-- node that takes care of the timestamp sync from different image sources -->
+    <node pkg="nodelet" type="nodelet" name="rgbd_sync" args="standalone rtabmap_ros/rgbd_sync" output="screen">
+      <remap from="rgb/image"       to="$(arg rgb_image_topic)"/>
+      <remap from="depth/image"     to="$(arg depth_image_topic)"/>
+      <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+      <remap from="rgbd_image"      to="rgbd_image"/> <!-- output of the rgbd sync -->
+      
+      <param name="approx_sync"       value="false"/> <!-- is false for realsense according to http://wiki.ros.org/rtabmap_ros/Tutorials/SetupOnYourRobot-->
+    </node>
+
+
+    <!-- Rtabmap calculates Visual Odometry based on RGB-D source -->
+    <node pkg="rtabmap_ros" type="rgbd_odometry" name="rgbd_odometry" output="screen">
+      <remap from="rgb/image"       to="$(arg rgb_image_topic)"/>
+      <remap from="depth/image"     to="$(arg depth_image_topic)"/>
+      <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+      <remap from="rgbd_image"      to="rgbd_image"/> <!--This is what rgbd_sync outputs-->
+      <remap from="odom"            to="odom"/> <!--visual odometry output in rtabmap namespace = /rtabmap/odom-->
+  
+      <param name="frame_id"                    type="string" value="$(arg frame_id)"/>
+      <param name="odom_frame_id"               type="string" value="odom"/>
+      <param name="publish_tf"                  type="bool"   value="true"/>
+      <param name="wait_for_transform_duration" type="double" value="0.2"/>
+      <param name="wait_imu_to_init"            type="bool"   value="false"/>
+      <param name="approx_sync"                 type="bool"   value="false"/>
+      <param name="subscribe_rgbd"              type="bool"   value="false"/>
+      <param name="Reg/Force3DoF"               type="string" value="true"/>  <!--Force the odometry to be calulcated for 3DoF (2D: x,y,yaw)-->
+    </node>
+
+
+    <!-- Rtabmap creates a 3D map-->
+    <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap"  args="--delete_db_on_start">
+      <param name="frame_id" type="string" value="base_footprint_rtabmap"/>
+
+      <param name="subscribe_depth" type="bool" value="true"/>
+      <param name="subscribe_rgbd" type="bool" value="false"/>
+
+      <remap from="odom" to="$(arg odom_topic)"/>  <!--odom topic from which rtabmap is reading its location to create a map-->
+      <remap from="rgb/image" to="$(arg rgb_image_topic)"/>
+      <remap from="depth/image" to="$(arg depth_image_topic)"/>
+      <remap from="rgbd_image" to="/camera/aligned_depth_to_color/image_raw"/>
+      <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+
+      <param name="queue_size" type="int" value="10"/>
+
+      <!-- RTAB-Map's parameters -->
+      <param name="RGBD/NeighborLinkRefining" type="string" value="true"/>
+      <param name="RGBD/ProximityBySpace"     type="string" value="true"/>
+      <param name="RGBD/AngularUpdate"        type="string" value="0.01"/>
+      <param name="RGBD/LinearUpdate"         type="string" value="0.01"/>
+      <param name="RGBD/OptimizeFromGraphEnd" type="string" value="false"/>
+      <param name="Grid/FromDepth"            type="string" value="false"/> <!-- occupancy grid from lidar -->
+      <param name="Reg/Strategy"              type="string" value="1"/> <!-- 1=ICP -->
+      
+      <!-- ICP parameters -->
+      <param name="Icp/VoxelSize"                 type="string" value="0.05"/>
+      <param name="Icp/MaxCorrespondenceDistance" type="string" value="0.1"/>
+    </node>
+  </group>
+
+
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_path)"/>
+
+  <!-- robot localisation parameters and node -->
+  <!-- <rosparam command="load" file="$(find mrntc_ref_launch)/configuration_files/robot_localisation/fiducialslam_odom.yaml" />
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true" output="screen" /> -->
+
+  
+  <!-- <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
+    <param name="reference_source_frame" type="string" value="map" />
+    <param name="reference_target_frame" type="string" value="base_footprint_ref" />
+    
+    <param name="test_souce_frame" type="string" value="map" />
+    <param name="test_target_frame" type="string" value="base_footprint_rtabmap" />
+
+    <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
+    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
+  </node>
+
+  <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
+    <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
+    <param name="frequency" type="double" value="3.0" /> 
+  </node> -->
+
+
+
+</launch>
