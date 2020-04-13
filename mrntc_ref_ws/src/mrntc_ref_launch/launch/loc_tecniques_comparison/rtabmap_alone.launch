@@ -1,0 +1,58 @@
+<launch>
+
+  <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+  <arg name="bag_path"/>
+
+  <arg name="camera_name"               default="camera"/> 
+  <arg name="use_rtabmapviz"            default="false"/>
+
+  <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+  <arg name="cpu_output_file_path" default="$(find ate_calculator)/src/rtabmap_imu_cpu_output.txt"/>
+  <arg name="ate_output_file_path" default="$(find ate_calculator)/src/rtabmap_imu_ate_output.txt"/>
+
+  <param name="/use_sim_time" type="bool" value="true"/>
+
+  <!-- rosbag start with clock parameter -->
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
+
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_base_footprint_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint /base_link 10"/> -->
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint2_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint2 /base_link 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/>
+  
+  <!-- Launch the rtabmapping for one camera with correct remapping and parameters -->
+  <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+    <arg name="rtabmap_args"       value="--delete_db_on_start"/> <!--delete the exsisting map on start-->
+    <arg name="depth_topic"        value="/$(arg camera_name)/aligned_depth_to_color/image_raw"/>
+    <arg name="rgb_topic"          value="/$(arg camera_name)/color/image_raw"/>
+    <arg name="camera_info_topic"  value="/$(arg camera_name)/color/camera_info"/>
+    <arg name="frame_id"           value="base_footprint2"/>
+    <arg name="approx_sync"        value="false"/> <!-- http://wiki.ros.org/rtabmap_ros/Tutorials/SetupOnYourRobot should be false with camera drivers for Kinect v2, ZED or realsense-->
+	  <param name="Reg/Force3DoF"               type="string" value="true"/> <!-- Set the rtabmap odometry to work in 3Dof (2D mode)-->
+  </include>
+
+
+  <!-- robot localisation parameters and node -->
+  <!-- <rosparam command="load" file="$(find mrntc_ref_launch)/configuration_files/robot_localisation/fiducialslam_odom.yaml" />
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true" output="screen" /> -->
+
+  
+  <!-- <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
+    <param name="reference_source_frame" type="string" value="map" />
+    <param name="reference_target_frame" type="string" value="base_footprint_cartographer" />
+    
+    <param name="test_souce_frame" type="string" value="map" />
+    <param name="test_target_frame" type="string" value="base_footprint" />
+
+    <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
+    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
+  </node>
+
+  <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
+    <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
+    <param name="frequency" type="double" value="3.0" /> 
+  </node> -->
+
+
+
+</launch>
