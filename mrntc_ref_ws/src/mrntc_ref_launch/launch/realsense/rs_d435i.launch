@@ -112,8 +112,8 @@
     </include>
   </group>
 
-  <!-- TODO: why is this neceserry? -->
-  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_link /camera_link 10"/>
+  <!-- Realsense is offset in x and z direction on the robot -->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 10"/>
 
   <!-- IMU is turned so the Z axis is pointing to the front of camera of d435i, here we turn it so x points forward -->
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/>

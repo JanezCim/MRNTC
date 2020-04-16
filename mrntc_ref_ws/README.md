@@ -88,3 +88,6 @@ Whenever using sim time, be sure you start with --clock parameter
 
         catkin_make -DCATKIN_BLACKLIST_PACKAGES="cartographer;cartographer_ros;cartographer_rviz"
 
+1. Save the map from cartographer with map server for the use in amcl package (TODO add in appropriate readme)
+
+        rosrun map_server map_saver -f room_ydlidar map:=/ydmap --occ 65 --free 20 -->

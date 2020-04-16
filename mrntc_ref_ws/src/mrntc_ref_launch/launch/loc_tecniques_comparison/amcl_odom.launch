@@ -1,5 +1,3 @@
-<!-- Launches filtered bag with transforms to camera, fiducial slam fused with odometry -->
-
 <launch>
 
   <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
@@ -9,8 +7,10 @@
   <arg name="rviz"                      default="true"/>
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/cartographerylidar_odom.rviz"/>
 
-  <arg name="cpu_output_file_path" default="$(find ate_calculator)/src/ydlidar_odom_cpu_output.txt"/>
-  <arg name="ate_output_file_path" default="$(find ate_calculator)/src/ydlidar_odom_ate_output.txt"/>
+  <arg name="map_path" default="$(find mrntc_ref_launch)/maps/room_ydlidar.yaml"/>
+
+  <arg name="cpu_output_file_path" default="$(find ate_calculator)/src/amcl_odom_cpu_output.txt"/>
+  <arg name="ate_output_file_path" default="$(find ate_calculator)/src/amcl_odom_ate_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
   <param name="/use_sim_time" type="bool" value="true"/>
@@ -24,25 +24,55 @@
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_link /camera_link 10"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 10"/> -->
-  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint_ref /laser 10"/> -->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint /laser 10"/>
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_yd_laser_frame" args="0.07 0.0 0.26 3.14 0.0 0.0 /base_footprint /yd_laser_frame 0" /> -->
 
 
-  <node name="cartographer_node" pkg="cartographer_ros"
-      type="cartographer_node" args="
-          -configuration_directory $(find mrntc_ref_launch)/launch/loc_tecniques_comparison
-          -configuration_basename cartographer_ydlidar.lua"
-      output="screen">
-    <remap from="echoes" to="horizontal_laser_2d" />
-    <remap from="imu" to="camera/imu" />
-    <remap from="scan" to="ydlidar_scan" />
+  <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_path)">
+    <remap from="map" to="ydmap"/>
   </node>
 
-  <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
-      type="cartographer_occupancy_grid_node" args="-resolution 0.05">
-    <remap from="map" to="ydmap" />
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+    <remap from="scan" to="/ydlidar_scan"/>
+    <remap from="map" to="ydmap"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="global_frame_id" value="yd_map"/>
+    
+    <param name="use_map_topic" value="true"/>
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_model_type" value="diff"/>
+    <param name="odom_alpha5" value="0.1"/>
+    <param name="transform_tolerance" value="0.2" />
+    <param name="gui_publish_rate" value="10.0"/>
+    <param name="laser_max_beams" value="30"/>
+    <param name="min_particles" value="500"/>
+    <param name="max_particles" value="5000"/>
+    <param name="kld_err" value="0.05"/>
+    <param name="kld_z" value="0.99"/>
+    <param name="odom_alpha1" value="0.2"/>
+    <param name="odom_alpha2" value="0.2"/>
+    <!-- translation std dev, m -->
+    <param name="odom_alpha3" value="0.8"/>
+    <param name="odom_alpha4" value="0.2"/>
+    <param name="laser_z_hit" value="0.5"/>
+    <param name="laser_z_short" value="0.05"/>
+    <param name="laser_z_max" value="0.05"/>
+    <param name="laser_z_rand" value="0.5"/>
+    <param name="laser_sigma_hit" value="0.2"/>
+    <param name="laser_lambda_short" value="0.1"/>
+    <param name="laser_lambda_short" value="0.1"/>
+    <param name="laser_model_type" value="likelihood_field"/>
+    <!-- <param name="laser_model_type" value="beam"/> -->
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <param name="update_min_d" value="0.2"/>
+    <param name="update_min_a" value="0.5"/>
+    <param name="resample_interval" value="1"/>
+    <param name="transform_tolerance" value="0.1"/>
+    <param name="recovery_alpha_slow" value="0.0"/>
+    <param name="recovery_alpha_fast" value="0.0"/>
   </node>
-  
+
   
   <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
     <param name="reference_source_frame" type="string" value="map" />

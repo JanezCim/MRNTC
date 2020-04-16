@@ -34,6 +34,11 @@
   <arg name="systematic_error" default="0.01"/>
   <arg name="covariance_diagonal" default="[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
 
+
+  <arg name="rviz"                      default="true"/>
+  <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/src/fiducialslam_odom_cpu_output.txt"/>
+  <arg name="ate_output_file_path"      default="$(find ate_calculator)/src/fiducialslam_odom_ate_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
   <param name="/use_sim_time" type="bool" value="true"/>
@@ -47,7 +52,7 @@
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 10"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint_ref /laser 10"/> -->
-
+  
 
   <!-- aruco detection -->
   <node pkg="aruco_detect" name="aruco_detect"
@@ -87,27 +92,24 @@
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true" output="screen" /> -->
 
   
-  <node name="ate_calculator" pkg="ate_calculator"
-      type="ate_calculator_node"
-      output="screen">
-
+  <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
     <param name="reference_source_frame" type="string" value="map" />
-    <param name="reference_target_frame" type="string" value="base_footprint_cartographer" />
+    <param name="reference_target_frame" type="string" value="base_footprint_ref" />
     
     <param name="test_souce_frame" type="string" value="map" />
-    <param name="test_target_frame" type="string" value="base_footprint" />
+    <param name="test_target_frame" type="string" value="base_footprint_rtabmap" />
 
     <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
-    <param name="out_file_path" type="string" value=" $(find ate_calculator)/src/fiducial_odom_ate_output.txt" />
+    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
   </node>
 
-  <node name="cpu_calculator" pkg="ate_calculator"
-      type="cpu_calculator_node"
-      output="screen">
-    <param name="out_file_path" type="string" value="$(find ate_calculator)/src/fiducial_odom_cpu_output.txt" />
-    <param name="frequency" type="double" value="5.0" /> 
+  <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
+    <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
+    <param name="frequency" type="double" value="3.0" /> 
   </node>
 
 
+
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_path)"/>
 
 </launch>
