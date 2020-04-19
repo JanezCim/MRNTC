@@ -12,27 +12,27 @@ using namespace std;
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "tf_clone_rename");
-  ros::NodeHandle node;
+  ros::NodeHandle node("~");
 
   // //#####################################ROS PARAMS################################################################ 
   string input_child_frame;
   string input_parent_frame;
-  if(!node.getParam("/tf_clone_renamer/input_parent_frame", input_parent_frame)){
+  if(!node.getParam("input_parent_frame", input_parent_frame)){
     ROS_ERROR("input_parent_frame must be set");
     return 0;
   }
-  if(!node.getParam("/tf_clone_renamer/input_child_frame", input_child_frame)){
+  if(!node.getParam("input_child_frame", input_child_frame)){
     ROS_ERROR("input_child_frame must be set");
     return 0;
   }
   
   string output_child_frame;
   string output_parent_frame;
-  if(!node.getParam("/tf_clone_renamer/output_parent_frame", output_parent_frame)){
+  if(!node.getParam("output_parent_frame", output_parent_frame)){
     ROS_ERROR("output_parent_frame must be set");
     return 0;
   }
-  if(!node.getParam("/tf_clone_renamer/output_child_frame", output_child_frame)){
+  if(!node.getParam("output_child_frame", output_child_frame)){
     ROS_ERROR("output_child_frame must be set");
     return 0;
   }

@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, char** argv){
   ros::init(argc, argv, "ate_calculator");
 
-  ros::NodeHandle node;
+  ros::NodeHandle node("~");
 
 
   //#####################################ROS PARAMS################################################################ 
@@ -20,16 +20,16 @@ int main(int argc, char** argv){
   string test_target_frame;
   string reference_source_frame;
   string test_source_frame;
-  node.param<std::string>("/ate_calculator/reference_target_frame", reference_target_frame, "ref_t_frame");
-  node.param<std::string>("/ate_calculator/test_souce_frame", test_source_frame, "test_s_frame");
-  node.param<std::string>("/ate_calculator/reference_source_frame", reference_source_frame, "ref_s_frame");
-  node.param<std::string>("/ate_calculator/test_target_frame", test_target_frame, "test_t_frame");
+  node.param<std::string>("reference_target_frame", reference_target_frame, "ref_t_frame");
+  node.param<std::string>("test_souce_frame", test_source_frame, "test_s_frame");
+  node.param<std::string>("reference_source_frame", reference_source_frame, "ref_s_frame");
+  node.param<std::string>("test_target_frame", test_target_frame, "test_t_frame");
   
   double timestamp_time_difference_thresh; // seconds
-  node.param("/ate_calculator/timestamp_time_difference_thresh", timestamp_time_difference_thresh, 0.01);
+  node.param("timestamp_time_difference_thresh", timestamp_time_difference_thresh, 0.01);
 
   string out_file;
-  node.param<std::string>("/ate_calculator/out_file_path", out_file, "ate_output.txt");
+  node.param<std::string>("out_file_path", out_file, "ate_output.txt");
  
   //#############################################################################################################
 
@@ -53,7 +53,7 @@ int main(int argc, char** argv){
   bool print_logging_msg = true;
 
   // main loop
-  ros::Rate rate(10.0);
+  ros::Rate rate(30.0);
   while (node.ok()){
     // Innit the transforms
     geometry_msgs::TransformStamped refTransform;
@@ -87,13 +87,14 @@ int main(int argc, char** argv){
     // check the timestamp difference between the two messages
     ros::Duration diff=testTransform.header.stamp-refTransform.header.stamp;
     if(fabs(diff.toSec())>timestamp_time_difference_thresh){
-      ROS_WARN("There are timestamp differences between tranformations larger than %f. Not counting towards ATE anymore", timestamp_time_difference_thresh);
+      ROS_WARN("There is a timestamp difference between tranformations: %f. It is larger than %f so thats is why not counting towards ATE anymore",fabs(diff.toSec()),  timestamp_time_difference_thresh);
     }
     else{
       dx = fabs(refTransform.transform.translation.x-testTransform.transform.translation.x);
       dy = fabs(refTransform.transform.translation.y-testTransform.transform.translation.y);
       dist_diff = sqrt(dx*dx+dy*dy);
 
+      ROS_INFO("Current ate: %lf", dist_diff);
       
       // logging difference and 
       myfile << dist_diff << "\t";

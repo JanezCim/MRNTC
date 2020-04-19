@@ -27,13 +27,13 @@ bool get_cpu_times(size_t &idle_time, size_t &total_time) {
  
 int main(int argc, char** argv) {
   ros::init(argc, argv, "cpu_calculator");
-  ros::NodeHandle node;
+  ros::NodeHandle node("~");
 
   //#####################################PARAMS################################################################### 
   std::string out_file;
-  node.param<std::string>("/cpu_calculator/out_file_path", out_file, "cpu_output.txt");
+  node.param<std::string>("out_file_path", out_file, "cpu_output.txt");
   double frequency; 
-  node.param("/cpu_calculator/freq_rate", frequency, 5.0);
+  node.param("freq_rate", frequency, 5.0);
   
   //#############################################################################################################
 
