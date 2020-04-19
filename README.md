@@ -1,5 +1,9 @@
 # Mobile Robot Navigation Techniques Comparison 
 
+This repo is part of an on-going master thesis work. 
+
+**Research question: How do different sensor fusion techniques and localisation algorithms help to provide usable robot localisation with low-cost sensors like cameras, wheel encoders and IMUs?**
+
 Overview of the prosidure:
 
 1. While all the sensors are outputing the data to ros AND cartographer is running within 2D slam mode an Innitial bag file is recorded.
