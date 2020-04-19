@@ -90,4 +90,20 @@ Whenever using sim time, be sure you start with --clock parameter
 
 1. Save the map from cartographer with map server for the use in amcl package (TODO add in appropriate readme)
 
-        rosrun map_server map_saver -f room_ydlidar map:=/ydmap --occ 65 --free 20 -->
+        cd src/mrntc_ref_launch/maps/
+        rosrun map_server map_saver -f room_ydlidar map:=/ydmap --occ 65 --free 20
+
+1. Prosedure to record a bag with realsense d435i and then making a 3d map and visual odometry with rtabmap from that bag
+        
+        Worked for me by launching the realsense launch [rs_camera.launch](https://github.com/IntelRealSense/realsense-ros/blob/development/realsense2_camera/launch/rs_camera.launch) with following changes: 
+
+        <arg name="enable_fisheye"      default="false"/> <!--disabled for less data traffic -->
+        <arg name="align_depth"               default="false"/>
+        <arg name="unite_imu_method"          default="linear_interpolation"/>
+          <arg name="publish_odom_tf"           default="false"/>
+
+        and by recording the bag with out compressed or theora: 
+
+        rosbag record -a -x "(.*)/compressed(.*)|(.*)/theora(.*)"
+
+        After I recorded the bag with this command and launched the rtabmap with default [rtabmap.launch](https://github.com/introlab/rtabmap_ros/blob/master/launch/rtabmap.launch), the 3d mapping and visual odometry worked.

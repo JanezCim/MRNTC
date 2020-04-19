@@ -139,6 +139,7 @@ include_directories(
 add_executable(${PROJECT_NAME}_node src/ate_calculator_node.cpp)
 add_executable(cpu_calculator_node src/cpu_calculator_node.cpp)
 add_executable(tf_clone_rename src/tf_clone_rename.cpp)
+add_executable(log_coordinates_node src/log_coordinates.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -154,6 +155,8 @@ add_dependencies(cpu_calculator_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catki
 
 add_dependencies(tf_clone_rename ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_dependencies(log_coordinates_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
@@ -161,9 +164,11 @@ target_link_libraries(${PROJECT_NAME}_node
 target_link_libraries(cpu_calculator_node
   ${catkin_LIBRARIES}
 )
-
 target_link_libraries(tf_clone_rename
   ${catkin_LIBRARIES}
+)
+target_link_libraries(log_coordinates_node
+${catkin_LIBRARIES}
 )
 
 #############

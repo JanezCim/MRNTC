@@ -1,0 +1,10 @@
+<launch>
+  <node name="log_coordinates" pkg="ate_calculator"
+      type="log_coordinates_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(find ate_calculator)/scripts/log_coordinates_output.txt" />
+    <param name="/frequency" type="double" value="10.0" /> 
+    <param name="parent_frame" value="map"/>
+    <param name="child_frame" value="base_footprint"/>
+  </node>
+</launch>
