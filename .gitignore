@@ -9,8 +9,7 @@ frames.gv
 frames.pdf
 youbot_setup.md
 *.bag
-*ate_output.txt
-*cpu_output.txt
+*output.txt
 run_bag_accusition.bash
 rviz/
 maps/
