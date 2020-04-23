@@ -66,4 +66,5 @@ if __name__ == "__main__":
 
   plt.plot(ref_x, ref_y, "-go")
   plt.plot(x, y, "r")
+  plt.axis('scaled')
   plt.show()
