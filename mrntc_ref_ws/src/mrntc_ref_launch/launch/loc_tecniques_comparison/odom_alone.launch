@@ -2,15 +2,17 @@
 
   <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
   <arg name="bag_path"/>
-  
+  <arg name="log_naming_prefix"         default=""/> <!--used as naming prefix to keep the log files organised -->
 
   <arg name="rviz"                      default="true"/>
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/amcl_odom.rviz"/>
 
   <arg name="map_path" default="$(find mrntc_ref_launch)/maps/room_ydlidar.yaml"/>
 
-  <arg name="cpu_output_file_path" default="$(find ate_calculator)/scripts/odom_alone_cpu_output.txt"/>
-  <arg name="ate_output_file_path" default="$(find ate_calculator)/scripts/odom_alone_ate_output.txt"/>
+  <arg name="log_coordinates"           default="true"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)odom_alone_cpu_output.txt"/>
+  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)odom_alone_coordinates_output.txt"/>
+
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
   <param name="/use_sim_time" type="bool" value="true"/>
@@ -19,24 +21,22 @@
   <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
 
   <!-- Static publishers of base_footprint->base_link->camera_link transforms -->
-  <node pkg="tf" type="static_transform_publisher" name="map_yd_map_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /map /odom 10"/>
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint /base_link 10"/>
-  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_link /camera_link 10"/> -->
-  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/> -->
-  <!-- <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 10"/> -->
-  <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint /laser 10"/>
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_yd_laser_frame" args="0.07 0.0 0.26 3.14 0.0 0.0 /base_footprint /yd_laser_frame 0" />
+  <node pkg="tf" type="static_transform_publisher" name="map_yd_map_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /map /odom 5"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint /base_link 5"/>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_link /camera_link 5"/> -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 5"/> -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 5"/> -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint /laser 5"/> -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_yd_laser_frame" args="0.07 0.0 0.26 3.14 0.0 0.0 /base_footprint /yd_laser_frame 5" /> -->
 
-  
-  <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
-    <param name="reference_source_frame" type="string" value="map" />
-    <param name="reference_target_frame" type="string" value="base_footprint_ref" />
-    
-    <param name="test_souce_frame" type="string" value="map" />
-    <param name="test_target_frame" type="string" value="base_footprint" />
-
-    <param name="timestamp_time_difference_thresh" type="double" value="0.1" />
-    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
+  <!-- coordinates logging -->
+  <node if="$(arg log_coordinates)" name="log_coordinates" pkg="ate_calculator"
+      type="log_coordinates_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(arg coordinates_output_file_path)" />
+    <param name="/frequency" type="double" value="3.0" /> 
+    <param name="parent_frame" value="map"/>
+    <param name="child_frame" value="base_footprint"/>
   </node>
 
   <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">

@@ -91,7 +91,7 @@ Whenever using sim time, be sure you start with --clock parameter
 1. Save the map from cartographer with map server for the use in amcl package (TODO add in appropriate readme)
 
         cd src/mrntc_ref_launch/maps/
-        rosrun map_server map_saver -f room_ydlidar map:=/ydmap --occ 65 --free 20
+        rosrun map_server map_saver -f room_ydlidar --occ 65 --free 20
 
 1. Prosedure to record a bag with realsense d435i and then making a 3d map and visual odometry with rtabmap from that bag
         

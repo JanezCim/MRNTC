@@ -79,9 +79,7 @@ if __name__ == "__main__":
     d = np.linalg.norm(np.cross(p2-p1, p1-p3))/np.linalg.norm(p2-p1)
     if(d<min_d):
       min_d = d
-
-    print " "
-    # print min_d
+      
     summ = summ + min_d
 
   print "ATE: " + str(summ/len(cx))

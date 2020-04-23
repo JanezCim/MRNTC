@@ -4,6 +4,8 @@
 
   <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
   <arg name="bag_path"/>
+  <arg name="log_naming_prefix"         default=""/> <!--used as naming prefix to keep the log files organised -->
+
 
   <arg name="image_topic" default="/camera/color/image_raw"/>
   <arg name="camera_info_topic" default="/camera/color/camera_info"/>
@@ -25,20 +27,22 @@
   <arg name="fiducial_len" default="0.14"/>
   <arg name="dictionary" default=""/>
   <arg name="do_pose_estimation" default="true"/>
-  <arg name="ignore_fiducials" default="" />
+  <arg name="ignore_fiducials" default="0,1" /> <!-- if there is any false positives, you can add them to ignore list here, separate with a comma-->
   <arg name="fiducial_len_override" default="" />
   <arg name="publish_tf" default="true"/>   <!--true for standalone operation, false for operation with robot_localisation-->
   <arg name="tf_publish_interval" default="0.2"/>
   <arg name="future_date_transforms" default="0.0"/>
-  <arg name="publish_6dof_pose" default="false"/>
+  <arg name="publish_6dof_pose" default="false"/> <!-- with false we force for 2D navigation-->
   <arg name="systematic_error" default="0.01"/>
+  <arg name="read_only_map" default="true"/>
   <arg name="covariance_diagonal" default="[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
 
 
   <arg name="rviz"                      default="true"/>
-  <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
-  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/src/fiducialslam_odom_cpu_output.txt"/>
-  <arg name="ate_output_file_path"      default="$(find ate_calculator)/src/fiducialslam_odom_ate_output.txt"/>
+  <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/fiducialslam_odom.rviz"/>
+  <arg name="log_coordinates"           default="true"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)fiducialslam_odom_cpu_output.txt"/>
+  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)fiducialslam_odom_coordinates_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
   <param name="/use_sim_time" type="bool" value="true"/>
@@ -47,7 +51,7 @@
   <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
 
   <!-- Static publishers of base_footprint->base_link->camera_link transforms -->
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint /base_link 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint /base_link 5"/>
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 -1.57 0.0 -1.57  /base_link /camera_link 10"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 10"/> -->
@@ -72,6 +76,7 @@
   <node type="fiducial_slam" pkg="fiducial_slam" output="screen" 
     name="fiducial_slam" required="true">
     <param name="map_file" value="$(env HOME)/.ros/slam/map.txt" />
+    <!-- <param name="initial_map_file" value="$(env HOME)/.ros/slam/empty_map.txt"/>  --> <!--point this param to an empty file to always start slam from empty map-->
     <param name="map_frame" value="$(arg map_frame)" />
     <param name="odom_frame" value="$(arg odom_frame)" />
     <param name="base_frame" value="$(arg base_frame)" />
@@ -83,24 +88,23 @@
     <param name="sum_error_in_quadrature" value="true"/>
     <param name="fiducial_len" value="$(arg fiducial_len)"/>
     <param name="covariance_diagonal" value="$(arg covariance_diagonal)"/>
+    <param name="read_only_map" value="$(arg read_only_map)"/>
     <remap from="/camera_info" to="$(arg camera_info_topic)"/>
+    
   </node>
-
 
   <!-- robot localisation parameters and node -->
   <!-- <rosparam command="load" file="$(find mrntc_ref_launch)/configuration_files/robot_localisation/fiducialslam_odom.yaml" />
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true" output="screen" /> -->
 
-  
-  <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
-    <param name="reference_source_frame" type="string" value="map" />
-    <param name="reference_target_frame" type="string" value="base_footprint_ref" />
-    
-    <param name="test_souce_frame" type="string" value="map" />
-    <param name="test_target_frame" type="string" value="base_footprint_rtabmap" />
-
-    <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
-    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
+  <!-- coordinates logging -->
+  <node if="$(arg log_coordinates)" name="log_coordinates" pkg="ate_calculator"
+      type="log_coordinates_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(arg coordinates_output_file_path)" />
+    <param name="/frequency" type="double" value="3.0" /> 
+    <param name="parent_frame" value="map"/>
+    <param name="child_frame" value="base_footprint"/>
   </node>
 
   <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">

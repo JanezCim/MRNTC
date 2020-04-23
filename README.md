@@ -87,3 +87,18 @@ New terminal for running the hokuyo driver
     source ../ros_remote.bash
     source devel/setup.bash
     roslaunch mrntc_test_launch hokuyo.launch serial_port:=/dev/ttyACM0
+
+
+# TODO: add
+## Checking the ATE of cartographer with hokuyo against ground truth:
+
+The bag has to be prepaired in the prosedure described here: (TODO)
+The recording of the reference ground trutch check is identical to reference check in all things, but the world frame is set to be the "world_frame" instead of "map" that is because we set the innitial position of the robot with it to corespond to the real orientation of the robot in the beginning.
+
+Inside reference_check.py set the coordinates of the ground truth polygon
+
+    cd <REF_WS>
+    source devel/setup.bash
+    roslaunch mrntc_ref_launch cartographerhokuyo_odom.launch world_frame:=world_frame bag_path:=<ABSOLUTE_PATH_TO_BAG> log_naming_prefix:=ref10_
+    cd src/ate_calculator/scripts/
+    python reference_check.py ref10_cartographerhokuyo_odom_coordinates_output.txt

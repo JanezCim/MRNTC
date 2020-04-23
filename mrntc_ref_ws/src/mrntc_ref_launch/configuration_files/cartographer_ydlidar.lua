@@ -4,7 +4,7 @@ include "trajectory_builder.lua"
 options = {
   map_builder = MAP_BUILDER,
   trajectory_builder = TRAJECTORY_BUILDER,
-  map_frame = "yd_map",
+  map_frame = "map",
   tracking_frame = "base_link",
   published_frame = "odom",
   odom_frame = "odom",

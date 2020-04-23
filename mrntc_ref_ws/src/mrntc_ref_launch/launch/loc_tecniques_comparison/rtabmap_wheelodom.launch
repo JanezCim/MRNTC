@@ -2,6 +2,7 @@
 
   <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
   <arg name="bag_path"/>
+  <arg name="log_naming_prefix"         default=""/> <!--used as naming prefix to keep the log files organised -->
 
   <arg name="frame_id"                  default="base_footprint_rtabmap"/>    <!--child frame of published visual odometry-->
   <arg name="rgb_image_topic"           default="/camera/color/image_raw"/>   
@@ -11,9 +12,9 @@
 
   <arg name="rviz"                      default="true"/>
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
-  
-  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/src/rtabmap_wheelodom_cpu_output.txt"/>
-  <arg name="ate_output_file_path"      default="$(find ate_calculator)/src/rtabmap_wheelodom_ate_output.txt"/>
+  <arg name="log_coordinates"           default="true"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_wheelodom_cpu_output.txt"/>
+  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_wheelodom_coordinates_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 
@@ -22,9 +23,11 @@
   <!-- rosbag start with clock parameter -->
   <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
 
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint2_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_rtabmap /base_link 10"/>
-  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 10"/> <!--TODO remove?-->
+  <node pkg="tf" type="static_transform_publisher" name="world_frame_map_broadcaster" args="0.0 0.0 0.0 -0.05 0.0 0.0  /world_frame /map 5"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint2_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_rtabmap /base_link 5"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 5"/> <!--TODO remove?-->
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint /laser 5"/>
 
   <group ns="rtabmap">
     <!-- node that takes care of the timestamp sync from different image sources -->
@@ -56,7 +59,6 @@
       <param name="Reg/Force3DoF"               type="string" value="true"/>  <!--Force the odometry to be calulcated for 3DoF (2D: x,y,yaw)-->
     </node>
 
-
     <!-- Rtabmap creates a 3D map-->
     <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap"  args="--delete_db_on_start">
       <param name="frame_id" type="string" value="base_footprint_rtabmap"/>
@@ -80,6 +82,8 @@
       <param name="RGBD/OptimizeFromGraphEnd" type="string" value="false"/>
       <param name="Grid/FromDepth"            type="string" value="false"/> <!-- occupancy grid from lidar -->
       <param name="Reg/Strategy"              type="string" value="1"/> <!-- 1=ICP -->
+      <param name="Reg/Force3DoF"             type="string" value="true"/>  <!--Force the mapping to be calulcated for 3DoF (2D: x,y,yaw)-->
+      <param name="Optimizer/Slam2D"          value="true"/> 
       
       <!-- ICP parameters -->
       <param name="Icp/VoxelSize"                 type="string" value="0.05"/>
@@ -94,22 +98,20 @@
   <!-- <rosparam command="load" file="$(find mrntc_ref_launch)/configuration_files/robot_localisation/fiducialslam_odom.yaml" />
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true" output="screen" /> -->
 
-  
-  <!-- <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
-    <param name="reference_source_frame" type="string" value="map" />
-    <param name="reference_target_frame" type="string" value="base_footprint_ref" />
-    
-    <param name="test_souce_frame" type="string" value="map" />
-    <param name="test_target_frame" type="string" value="base_footprint_rtabmap" />
-
-    <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
-    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
+  <!-- coordinates logging -->
+  <node if="$(arg log_coordinates)" name="log_coordinates" pkg="ate_calculator"
+      type="log_coordinates_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(arg coordinates_output_file_path)" />
+    <param name="/frequency" type="double" value="3.0" /> 
+    <param name="parent_frame" value="map"/>
+    <param name="child_frame" value="base_footprint_rtabmap"/>
   </node>
 
   <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
     <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
     <param name="frequency" type="double" value="3.0" /> 
-  </node> -->
+  </node>
 
 
 

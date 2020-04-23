@@ -2,6 +2,7 @@
 
   <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
   <arg name="bag_path"/>
+  <arg name="log_naming_prefix"         default=""/> <!--used as naming prefix to keep the log files organised -->
 
   <arg name="frame_id"                  default="base_footprint_rtabmap"/>    <!--child frame of published visual odometry-->
   <arg name="rgb_image_topic"           default="/camera/color/image_raw"/>   
@@ -9,10 +10,12 @@
   <arg name="camera_info_topic"         default="/camera/color/camera_info"/>
   <arg name="odom_topic"                default="/rtabmap/odom"/>       <!--topic that rtabmap map maker subscribes to as odometry source (/odom for wheel and /rtabmap/odom for visual odometry) -->
 
+
   <arg name="rviz"                      default="true"/>
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
-  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/src/rtabmap_visualodom_cpu_output.txt"/>
-  <arg name="ate_output_file_path"      default="$(find ate_calculator)/src/rtabmap_visualodom_ate_output.txt"/>
+  <arg name="log_coordinates"           default="true"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_visualodom_cpu_output.txt"/>
+  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_visualodom_coordinates_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 
@@ -21,9 +24,9 @@
   <!-- rosbag start with clock parameter -->
   <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
 
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint2_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_rtabmap /base_link 10"/>
-  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 10"/> <!--TODO remove-->
-  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint2_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_rtabmap /base_link 5"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 5"/> <!--TODO remove-->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 5"/>
 
   <group ns="rtabmap">
     <!-- node that takes care of the timestamp sync from different image sources -->
@@ -101,14 +104,24 @@
     <param name="test_souce_frame" type="string" value="map" />
     <param name="test_target_frame" type="string" value="base_footprint_rtabmap" />
 
-    <param name="timestamp_time_difference_thresh" type="double" value="0.01" />
+    <param name="timestamp_time_difference_thresh" type="double" value="0.3" />
     <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
+  </node> -->
+
+  <!-- coordinates logging -->
+  <node if="$(arg log_coordinates)" name="log_coordinates" pkg="ate_calculator"
+      type="log_coordinates_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(arg coordinates_output_file_path)" />
+    <param name="/frequency" type="double" value="3.0" /> 
+    <param name="parent_frame" value="map"/>
+    <param name="child_frame" value="base_footprint_rtabmap"/>
   </node>
 
   <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
     <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
     <param name="frequency" type="double" value="3.0" /> 
-  </node> -->
+  </node>
 
 
 

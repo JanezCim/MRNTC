@@ -20,7 +20,7 @@ int main(int argc, char** argv){
   node.param<std::string>("child_frame", child_frame, "undefined_child_frame");
   
   double frequency; //hz
-  node.param("frequency", frequency, 10.0);
+  node.param("frequency", frequency, 5.0);
 
   string out_file;
   node.param<std::string>("out_file_path", out_file, "coordinates_output.txt"); 
@@ -64,6 +64,7 @@ int main(int argc, char** argv){
       myfile << x << "\t";
       myfile << y << "\t";
       myfile << z << "\t";
+      myfile << ros::Time::now() << "\t";
       myfile << endl;
 
       old_x = x;

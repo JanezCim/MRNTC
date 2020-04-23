@@ -3,7 +3,7 @@
 <launch>
   <!-- <param name="/use_sim_time" type="bool" value="true"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0 0 0 0 0 0  /base_footprint2 /base_link 10"/> -->
-
+  
   
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
