@@ -4,14 +4,10 @@
   <arg name="bag_path"/>
   <arg name="log_naming_prefix"         default=""/> <!--used as naming prefix to keep the log files organised -->
 
-  <arg name="frame_id"                  default="base_footprint_rtabmap"/>    <!--child frame of published visual odometry-->
+  <arg name="base_link_frame"           default="base_footprint"/>    <!--child frame of published visual odometry-->
   <arg name="rgb_image_topic"           default="/camera/color/image_raw"/>   
   <arg name="depth_image_topic"         default="/camera/aligned_depth_to_color/image_raw"/>
   <arg name="camera_info_topic"         default="/camera/color/camera_info"/>
-  <arg name="odom_topic"                default="/odom"/>       <!--topic that rtabmap map maker subscribes to as odometry source (/odom for wheel and /rtabmap/odom for visual odometry) -->
-
-  <arg name="imu_ignore_acc"            default="true" />
-  <arg name="imu_remove_gravitational_acceleration" default="true" />
 
   <arg name="rviz"                      default="true"/>
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
@@ -20,24 +16,23 @@
   <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_visualodom_wheelodom_coordinates_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-
   <param name="/use_sim_time" type="bool" value="true"/>
 
   <!-- rosbag start with clock parameter -->
   <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
 
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint2_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint_rtabmap /base_link 5"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /$(arg base_link_frame) /base_link 5"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 5"/> <!--TODO remove-->
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 5"/>
 
   <!-- republish wheel odometry with covariances -->
   <node pkg="ate_calculator" name="odom_republisher" type="odom_republisher.py" output="screen"> 
-    <remap from="odom" to="/odom"/>
-    <remap from="odom_republished" to="odom_republished"/>
+    <remap from="/odom" to="/odom"/>
+    <remap from="/odom_republished" to="odom_republished"/>
   </node>
 
   <!-- Localization-only mode -->
-  <arg name="localization"      default="false"/>
+  <arg name="localization"      default="true"/>
   <arg     if="$(arg localization)" name="rtabmap_args"  default=""/>
   <arg unless="$(arg localization)" name="rtabmap_args"  default="--delete_db_on_start"/>  
   
@@ -60,7 +55,7 @@
       <remap from="rgbd_image"      to="rgbd_image"/> <!--This is what rgbd_sync outputs-->
       <remap from="odom"            to="/rtabmap/odom"/>
 
-      <param name="frame_id"               type="string" value="$(arg frame_id)"/>
+      <param name="frame_id"               type="string" value="$(arg base_link_frame)"/>
       <param name="publish_tf"             type="bool"   value="false"/>
       <param name="publish_null_when_lost" type="bool"   value="true"/>
       <param name="guess_from_tf"          type="bool"   value="true"/>
@@ -72,8 +67,8 @@
     </node>
 
     <!-- SLAM -->
-    <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
-      <param name="frame_id"        type="string" value="$(arg frame_id)"/>
+    <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="--delete_db_on_start">
+      <param name="frame_id"        type="string" value="$(arg base_link_frame)"/>
  
       <remap from="rgb/image"       to="$(arg rgb_image_topic)"/>
       <remap from="depth/image"     to="$(arg depth_image_topic)"/>
@@ -83,9 +78,8 @@
       <param name="Kp/DetectorStrategy"    type="string" value="6"/> <!-- use same features as odom -->
 
       <!-- localization mode -->
-      <param name="Mem/InitWMWithAllNodes" type="string" value="$(arg localization)"/> 
-      <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
-      <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
+      <param name="Mem/InitWMWithAllNodes" type="string" value="false"/> 
+      <param name="Mem/IncrementalMemory" type="string" value="true"/>
       
     </node>
   </group>
@@ -93,34 +87,37 @@
   <!-- Odometry fusion (EKF), refer to demo launch file in robot_localization for more info -->
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
 
-      <param name="frequency" value="20"/>
+
+      <param name="frequency" value="30"/>
       <param name="sensor_timeout" value="0.1"/>
       <param name="two_d_mode" value="true"/> <!--false-->
+      <param name="use_control" value="true"/> <!--false-->
 
       <param name="odom_frame" value="odom"/>
-      <param name="base_link_frame" value="$(arg frame_id)"/>
+      <param name="base_link_frame" value="$(arg base_link_frame)"/>
       <param name="world_frame" value="odom"/>
 
       <param name="transform_time_offset" value="0.0"/>
 
+      <!-- readings from these two topics are fused -->
       <param name="odom0" value="/rtabmap/odom"/>
       <param name="odom1" value="/odom_republished"/> 
 
       <!-- The order of the values is x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az. -->
-      <rosparam param="odom0_config">[false, false, false,
+      <rosparam param="odom0_config">[true, true, false,
                                       false, false, false,
                                       false, false, false,
-                                      true, true, true,
-                                      false, false, false]</rosparam>
+                                      false, true, true,
+                                      false, false, false]</rosparam> <!--visualodom-->
 
-      <rosparam param="odom1_config">[false, false, false,
+      <rosparam param="odom1_config">[true, true, true,
+                                      false, false,  false,
+                                      false, false, true,
                                       false,  false,  false,
-                                      true, true, true,
-                                      false,  false,  false,
-                                      false,  false,  false] </rosparam>
+                                      false,  false,  false] </rosparam> <!--wheelodom-->
       
       <param name="odom0_differential" value="false"/>
-      <param name="odom1_differential" value="false"/>
+      <param name="odom1_differential" value="true"/>
 
       <param name="odom0_relative" value="true"/>
       <param name="odom1_relative" value="true"/>
@@ -129,24 +126,11 @@
 
       <!-- ======== ADVANCED PARAMETERS ======== -->
       <param name="odom0_queue_size" value="5"/>
-      <param name="odom1_queue_size" value="100"/> 
+      <param name="odom1_queue_size" value="50"/> 
 
-     
-
-    </node>
+  </node>
 
   <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_path)"/>
-
-  <!-- <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
-    <param name="reference_source_frame" type="string" value="map" />
-    <param name="reference_target_frame" type="string" value="base_footprint_ref" />
-    
-    <param name="test_souce_frame" type="string" value="map" />
-    <param name="test_target_frame" type="string" value="base_footprint_rtabmap" />
-
-    <param name="timestamp_time_difference_thresh" type="double" value="0.3" />
-    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
-  </node> -->
 
   <!-- coordinates logging -->
   <node if="$(arg log_coordinates)" name="log_coordinates" pkg="ate_calculator"
@@ -155,7 +139,7 @@
     <param name="out_file_path" type="string" value="$(arg coordinates_output_file_path)" />
     <param name="/frequency" type="double" value="3.0" /> 
     <param name="parent_frame" value="map"/>
-    <param name="child_frame" value="base_footprint_rtabmap"/>
+    <param name="child_frame" value="base_footprint"/>
   </node>
 
   <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
