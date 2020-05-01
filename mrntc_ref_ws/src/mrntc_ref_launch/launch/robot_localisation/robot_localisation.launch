@@ -1,8 +1,0 @@
-<launch>
-
-  <rosparam command="load" file="$(find mrntc_ref_launch)/configuration_files/robot_localisation/robot_localisation.yaml" />
-
-  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true" output="screen" /> 
-
-
-</launch>
