@@ -19,7 +19,7 @@
   <param name="/use_sim_time" type="bool" value="true"/>
 
   <!-- rosbag start with clock parameter -->
-  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)" required="true"/>
 
   <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /$(arg base_link_frame) /base_link 5"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 5"/> <!--TODO remove-->
@@ -29,6 +29,8 @@
   <node pkg="ate_calculator" name="odom_republisher" type="odom_republisher.py" output="screen"> 
     <remap from="/odom" to="/odom"/>
     <remap from="/odom_republished" to="odom_republished"/>
+    <param name="pose_covariance_diagonal_override" value="[0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]"/>
+    <param name="twist_covariance_diagonal_override" value="[0.001, 0.001, 0.001, 0.001, 0.001, 0.001]"/>
   </node>
 
   <!-- Localization-only mode -->
@@ -87,7 +89,6 @@
   <!-- Odometry fusion (EKF), refer to demo launch file in robot_localization for more info -->
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
 
-
       <param name="frequency" value="30"/>
       <param name="sensor_timeout" value="0.1"/>
       <param name="two_d_mode" value="true"/> <!--false-->
@@ -116,7 +117,7 @@
                                       false,  false,  false,
                                       false,  false,  false] </rosparam> <!--wheelodom-->
       
-      <param name="odom0_differential" value="false"/>
+      <param name="odom0_differential" value="true"/>
       <param name="odom1_differential" value="true"/>
 
       <param name="odom0_relative" value="true"/>
