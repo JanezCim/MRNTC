@@ -10,14 +10,14 @@
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/cartographerylidar_odom.rviz"/>
 
   <arg name="log_coordinates"           default="true"/>
-  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)cartographerydlidar_odom_cpu_output.txt"/>
-  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)cartographerydlidar_odom_coordinates_output.txt"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)cartographerydlidar_odom_imu_cpu_output.txt"/>
+  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)cartographerydlidar_odom_imu_coordinates_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
   <param name="/use_sim_time" type="bool" value="true"/>
   
   <!-- rosbag start with clock parameter -->
-  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)"/>
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)" required="true"/>
 
   <!-- Static publishers of base_footprint->base_link->camera_link transforms -->
   <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /base_footprint /base_link 5"/>
@@ -25,13 +25,39 @@
   <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 5"/> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 5"/> -->
   <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint /laser 5"/>
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_yd_laser_frame" args="0.15 0.0 0.26 3.2 0.0 0.0 /base_footprint /yd_laser_frame 5" />
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_yd_laser_frame" args="0.11 0.0 0.26 3.14 0.0 0.0 /base_footprint /yd_laser_frame 5" />
 
+  <!-- Odometry fusion (EKF), refer to demo launch file in robot_localization for more info -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
+      <param name="frequency" value="15"/>
+      <param name="sensor_timeout" value="0.1"/>
+      <param name="two_d_mode" value="true"/> 
+      <param name="use_control" value="true"/>
+
+      <param name="odom_frame" value="odom"/>
+      <param name="base_link_frame" value="base_footprint"/>
+      <param name="world_frame" value="odom"/>
+
+      <param name="transform_time_offset" value="0.0"/>
+
+      <param name="odom0" value="/odom"/> 
+
+      <rosparam param="odom0_config">[true, true, true,
+                                      false, false, true,
+                                      true, true, true,
+                                      false, false, false,
+                                      false, false, false]</rosparam> 
+                                      
+      <param name="odom0_differential" value="false"/>
+      <param name="odom0_relative" value="true"/>
+      <param name="print_diagnostics" value="true"/>
+      <param name="odom0_queue_size" value="5"/>
+  </node>
 
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find mrntc_ref_launch)/configuration_files
-          -configuration_basename cartographer_ydlidar.lua"
+          -configuration_basename cartographer_ydlidar_odom_imu.lua"
       output="screen">
     <remap from="echoes" to="horizontal_laser_2d" />
     <remap from="imu" to="camera/imu" />
@@ -42,7 +68,6 @@
       type="cartographer_occupancy_grid_node" args="-resolution 0.05">
   </node>
   
-  
   <node if="$(arg log_coordinates)" name="log_coordinates" pkg="ate_calculator"
       type="log_coordinates_node"
       output="screen">
@@ -52,22 +77,10 @@
     <param name="child_frame" value="base_footprint"/>
   </node>
 
-
-  <!-- <node name="ate_calculator" pkg="ate_calculator" type="ate_calculator_node" output="screen">
-    <param name="reference_source_frame" type="string" value="map" />
-    <param name="reference_target_frame" type="string" value="base_footprint_ref" />
-    
-    <param name="test_souce_frame" type="string" value="map" />
-    <param name="test_target_frame" type="string" value="base_footprint" />
-
-    <param name="timestamp_time_difference_thresh" type="double" value="0.1" />
-    <param name="out_file_path" type="string" value=" $(arg ate_output_file_path)" />
-  </node> -->
-
-  <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
+  <!-- <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
     <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
     <param name="frequency" type="double" value="3.0" /> 
-  </node>
+  </node> -->
 
   <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_path)"/>
 
