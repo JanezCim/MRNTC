@@ -9,12 +9,14 @@
   <arg name="depth_image_topic"         default="/camera/aligned_depth_to_color/image_raw"/>
   <arg name="camera_info_topic"         default="/camera/color/camera_info"/>
 
+  <arg name="imu_remove_gravitational_acceleration" default="true" />
+
   <arg name="rviz"                      default="true"/>
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
   <arg name="log_coordinates"           default="true"/>
   <arg name="log_cpu"                   default="false"/>
-  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_visualodom_wheelodom_cpu_output.txt"/>
-  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_visualodom_wheelodom_coordinates_output.txt"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)wheelodom_imu_cpu_output.txt"/>
+  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)wheelodom_imu_coordinates_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
   <param name="/use_sim_time" type="bool" value="true"/>
@@ -22,39 +24,23 @@
   <!-- rosbag start with clock parameter -->
   <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)" required="true"/>
 
+  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /map /odom 5"/>
   <node pkg="tf" type="static_transform_publisher" name="base_footprint_base_link_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0  /$(arg base_link_frame) /base_link 5"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.18 0.0 0.18 0.0 0.0 0.0  /base_link /camera_link 5"/> <!--TODO remove-->
   <node pkg="tf" type="static_transform_publisher" name="base_link_camera_imu_optical_frame_broadcaster" args="0.0 0.0 0.0 1.57 3.14 1.57 /base_link /camera_imu_optical_frame 5"/>
 
   <!-- republish wheel odometry with covariances -->
   <node pkg="ate_calculator" name="odom_republisher" type="odom_republisher.py" output="screen"> 
-    <remap from="/odom" to="/odom"/>
-    <remap from="/odom_republished" to="odom_republished"/>
-    <param name="pose_covariance_diagonal_override" value="[0.001, 0.001, 0.001, 0.001, 0.001, 0.001]"/>
-    <param name="twist_covariance_diagonal_override" value="[0.001, 0.001, 0.001, 0.001, 0.001, 0.001]"/>
+    <remap from="odom" to="/odom"/>
+    <remap from="odom_republished" to="odom_republished"/>
   </node>
-
-  <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
-    <arg name="rtabmap_args"       value="--delete_db_on_start"/>
-    <arg name="depth_topic"        value="/$(arg depth_image_topic)"/>
-    <arg name="rgb_topic"          value="/$(arg rgb_image_topic)"/>
-    <arg name="camera_info_topic"  value="/$(arg camera_info_topic)"/>
-    <arg name="frame_id"           value="$(arg base_link_frame)"/>
-    
-    <!-- <arg name="subscribe_scan"     value="true"/> -->
-    <arg name="approx_sync"        value="true"/> <!-- false -->
-    <arg name="rviz"               value="false"/>
-    <arg name="rtabmapviz"         value="false"/>
-    <arg name="publish_tf_odom"    value="false"/>
-  </include>
 
   <!-- Odometry fusion (EKF), refer to demo launch file in robot_localization for more info -->
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
 
-      <param name="frequency" value="15"/>
+      <param name="frequency" value="30"/>
       <param name="sensor_timeout" value="0.1"/>
       <param name="two_d_mode" value="true"/> <!--false-->
-      <param name="use_control" value="true"/> <!--false-->
 
       <param name="odom_frame" value="odom"/>
       <param name="base_link_frame" value="$(arg base_link_frame)"/>
@@ -62,36 +48,37 @@
 
       <param name="transform_time_offset" value="0.0"/>
 
-      <!-- readings from these two topics are fused -->
-      <param name="odom0" value="/rtabmap/odom"/>
-      <param name="odom1" value="/odom_republished"/> 
+      <param name="odom0" value="/odom_republished"/>
+      <param name="imu0" value="/camera/imu"/> 
 
       <!-- The order of the values is x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az. -->
-      <rosparam param="odom0_config">[false, false, false,
+      <rosparam param="odom0_config">[true, true, true,
+                                      false, false, true,
                                       false, false, false,
                                       false, false, false,
-                                      true, true, true,
-                                      false, false, false]</rosparam> <!--visualodom-->
+                                      false, false, false]</rosparam>
 
-      <rosparam param="odom1_config">[false, false, false,
-                                      false, false, false,
-                                      true,  true,  true,
-                                      true,  true,  true,
-                                      false,  false,  false] </rosparam> <!--wheelodom-->
-      
-      <param name="odom0_differential" value="true"/>
-      <param name="odom1_differential" value="true"/>
+      <rosparam param="imu0_config"> [false, false, false,
+                                      false,  false, false,
+                                      true, true, true,
+                                      false,  false,  false,
+                                      false,  false,  false] </rosparam>
+
+      <param name="odom0_differential" value="false"/>
+      <param name="imu0_differential" value="true"/>
 
       <param name="odom0_relative" value="true"/>
-      <param name="odom1_relative" value="true"/>
+      <param name="imu0_relative" value="true"/>
+
+      <param name="imu0_remove_gravitational_acceleration" value="$(arg imu_remove_gravitational_acceleration)"/>
 
       <param name="print_diagnostics" value="true"/>
 
       <!-- ======== ADVANCED PARAMETERS ======== -->
-      <param name="odom0_queue_size" value="5"/>
-      <param name="odom1_queue_size" value="50"/> 
+      <param name="odom0_queue_size" value="30"/>
+      <param name="imu0_queue_size" value="30"/> 
 
-  </node>
+    </node>
 
   <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_path)"/>
 
@@ -102,14 +89,12 @@
     <param name="out_file_path" type="string" value="$(arg coordinates_output_file_path)" />
     <param name="/frequency" type="double" value="3.0" /> 
     <param name="parent_frame" value="map"/>
-    <param name="child_frame" value="base_footprint"/>
+    <param name="child_frame" value="$(arg base_link_frame)"/>
   </node>
 
   <node if="$(arg log_cpu)" name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
     <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
     <param name="frequency" type="double" value="3.0" /> 
   </node>
-
-
 
 </launch>

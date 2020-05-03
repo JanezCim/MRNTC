@@ -10,6 +10,7 @@
   <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/cartographerylidar_odom.rviz"/>
 
   <arg name="log_coordinates"           default="true"/>
+  <arg name="log_cpu"                   default="false"/>
   <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)cartographerydlidar_imu_cpu_output.txt"/>
   <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)cartographerydlidar_imu_coordinates_output.txt"/>
   <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
@@ -77,7 +78,7 @@
     <param name="child_frame" value="base_footprint"/>
   </node>
 
-  <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
+  <node if="$(arg log_cpu)" name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
     <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
     <param name="frequency" type="double" value="3.0" /> 
   </node>

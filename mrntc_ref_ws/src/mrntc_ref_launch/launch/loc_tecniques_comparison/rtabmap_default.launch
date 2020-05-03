@@ -1,0 +1,82 @@
+<launch>
+  <!-- PARAMS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+  <arg name="bag_path"/>
+  <arg name="log_naming_prefix"         default=""/> <!--used as naming prefix to keep the log files organised -->
+
+  <arg name="base_link_frame"           default="base_footprint"/>    <!--child frame of published visual odometry-->
+  <arg name="rgb_image_topic"           default="/camera/color/image_raw"/>   
+  <arg name="depth_image_topic"         default="/camera/aligned_depth_to_color/image_raw"/>
+  <arg name="camera_info_topic"         default="/camera/color/camera_info"/>
+
+  <arg name="rviz"                      default="true"/>
+  <arg name="rviz_path"                 default="$(find mrntc_ref_launch)/rviz/rtabmap.rviz"/>
+  <arg name="log_coordinates"           default="true"/>
+  <arg name="log_cpu"                   default="false"/>
+  <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_default_cpu_output.txt"/>
+  <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)rtabmap_default_coordinates_output.txt"/>
+  <!-- /PARAMS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+  <param name="/use_sim_time" type="bool" value="true"/>
+
+  <!-- rosbag start with clock parameter -->
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg bag_path)" required="true"/>
+
+  <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+    <arg name="rtabmap_args"       value="--delete_db_on_start"/>
+    <arg name="depth_topic"        value="/$(arg depth_image_topic)"/>
+    <arg name="rgb_topic"          value="/$(arg rgb_image_topic)"/>
+    <arg name="camera_info_topic"  value="/$(arg camera_info_topic)"/>
+    <arg name="frame_id"           value="$(arg base_link_frame)"/>
+    
+    <!-- <arg name="subscribe_scan"     value="true"/> -->
+    <arg name="approx_sync"        value="true"/> <!-- false -->
+    <arg name="rviz"               value="false"/>
+    <arg name="rtabmapviz"         value="false"/>
+    
+  </include>
+
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_path)"/>
+
+  <!--This here just to make a transform odom->base_link from an odom topic messages -->
+  <!-- <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
+    <param name="frequency" value="15"/>
+    <param name="sensor_timeout" value="0.1"/>
+    <param name="two_d_mode" value="true"/>
+    <param name="use_control" value="true"/>
+
+    <param name="odom_frame" value="odom"/>
+    <param name="base_link_frame" value="base_link"/>
+    <param name="world_frame" value="odom"/>
+
+    <param name="transform_time_offset" value="0.0"/>
+
+    <param name="odom0" value="/rtabmap/odom"/> 
+
+    <rosparam param="odom0_config">[true, true, true,
+                                    false, false, true,
+                                    true, true, true,
+                                    false, false, false,
+                                    false, false, false]</rosparam> 
+                                    
+    <param name="odom0_differential" value="false"/>
+    <param name="odom0_relative" value="true"/>
+    <param name="print_diagnostics" value="true"/>
+    <param name="odom0_queue_size" value="5"/>
+  </node> -->
+
+  <!-- coordinates logging -->
+  <node if="$(arg log_coordinates)" name="log_coordinates" pkg="ate_calculator"
+      type="log_coordinates_node"
+      output="screen">
+    <param name="out_file_path" type="string" value="$(arg coordinates_output_file_path)" />
+    <param name="/frequency" type="double" value="3.0" /> 
+    <param name="parent_frame" value="map"/>
+    <param name="child_frame" value="base_footprint"/>
+  </node>
+
+  <node if="$(arg log_cpu)" name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
+    <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
+    <param name="frequency" type="double" value="3.0" /> 
+  </node>
+
+</launch>

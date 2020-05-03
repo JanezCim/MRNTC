@@ -9,6 +9,7 @@
 
   <arg name="map_path" default="$(find mrntc_ref_launch)/maps/room_ydlidar.yaml"/>
   <arg name="log_coordinates"           default="true"/>
+  <arg name="log_cpu"                   default="false"/>
   <arg name="cpu_output_file_path"      default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)amcl_odom_cpu_output.txt"/>
   <arg name="coordinates_output_file_path" default="$(find ate_calculator)/scripts/$(arg log_naming_prefix)amcl_odom_coordinates_output.txt"/>
 
@@ -26,6 +27,35 @@
   <!-- <node pkg="tf" type="static_transform_publisher" name="camera_link_camera_color_optical_frame_broadcaster" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 10"/> -->
   <node pkg="tf" type="static_transform_publisher" name="base_link_laser_broadcaster" args="0.275 0.0 0.12 0.0 0.0 0.0  /base_footprint /laser 5"/>
   <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_yd_laser_frame" args="0.15 0.0 0.26 3.2 0.0 0.0 /base_footprint /yd_laser_frame 5" />
+
+  <!--This here just to make a transform odom->base_link from an odom topic messages -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
+      <param name="frequency" value="15"/>
+      <param name="sensor_timeout" value="0.1"/>
+      <param name="two_d_mode" value="true"/>
+      <param name="use_control" value="true"/>
+
+      <param name="odom_frame" value="odom"/>
+      <param name="base_link_frame" value="base_footprint"/>
+      <param name="world_frame" value="odom"/>
+
+      <param name="transform_time_offset" value="0.0"/>
+
+      <!-- readings from these two topics are fused -->
+      <param name="odom0" value="/odom"/> 
+
+      <!-- The order of the values is x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az. -->
+      <rosparam param="odom0_config">[true, true, true,
+                                      false, false, true,
+                                      true, true, true,
+                                      false, false, false,
+                                      false, false, false]</rosparam> 
+                                      
+      <param name="odom0_differential" value="false"/>
+      <param name="odom0_relative" value="true"/>
+      <param name="print_diagnostics" value="true"/>
+      <param name="odom0_queue_size" value="5"/>
+  </node>
 
 
   <!-- Run the map server -->
@@ -81,7 +111,7 @@
     <param name="child_frame" value="base_footprint"/>
   </node>
 
-  <node name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
+  <node if="$(arg log_cpu)" name="cpu_calculator" pkg="ate_calculator" type="cpu_calculator_node" output="screen">
     <param name="out_file_path" type="string" value="$(arg cpu_output_file_path)" />
     <param name="frequency" type="double" value="3.0" /> 
   </node>

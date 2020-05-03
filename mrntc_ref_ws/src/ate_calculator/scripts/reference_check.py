@@ -11,19 +11,6 @@ from numpy.linalg import det, norm
 # input polygon points
 polygon = [(0,0), (2.8,0), (2.8,-2.8), (0,-2.8)]
 
-
-# from: https://gist.github.com/nim65s/5e9902cd67f094ce65b0
-# def dist(A, B, P):
-#     """ segment line AB, point P, where each one is an array([x, y]) """
-#     if all(A == P) or all(B == P):
-#         return 0
-#     if arccos(dot((P - A) / norm(P - A), (B - A) / norm(B - A))) > pi / 2:
-#         return norm(P - A)
-#     if arccos(dot((P - B) / norm(P - B), (A - B) / norm(A - B))) > pi / 2:
-#         return norm(P - B)
-#     return norm(cross(A-B, A-P))/norm(B-A)
-
-
 if __name__ == "__main__":
   rx = []
   ry = []
@@ -84,6 +71,11 @@ if __name__ == "__main__":
 
   print "ATE: " + str(summ/len(cx))
 
-  plt.plot(rx, ry, "-go")
-  plt.plot(cx, cy)
+  plt.plot(rx, ry, "-ro", label="Ground truth")
+  plt.plot(cx, cy, label="Reference trajectory")
+  plt.ylabel("Y coordinate (m)")
+  plt.xlabel("X coordinate (m)")
+  plt.legend(loc="upper left")
+  plt.ylim(-3, 1.5)
+  plt.axis('scaled')
   plt.show()
