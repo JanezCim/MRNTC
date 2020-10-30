@@ -9,7 +9,7 @@ from numpy.linalg import det, norm
 
 
 # input polygon points
-polygon = [(0,0), (2.8,0), (2.8,-2.8), (0,-2.8)]
+polygon = [(0,0), (1.0,0), (1.0,-0.583), (0,-0.583)]
 
 if __name__ == "__main__":
   rx = []
@@ -46,6 +46,8 @@ if __name__ == "__main__":
   ### The shortest distance of each p3 gets summed up and avaraged at the end.
 
   summ = 0
+  max_offset = 0
+  max_offset_index = 0  
   # with p3 go through all the path points
   for i in range(0,len(cx)):
 
@@ -69,10 +71,22 @@ if __name__ == "__main__":
       
     summ = summ + min_d
 
+    #seach for the biggest offset
+    if(min_d>max_offset):
+      max_offset = min_d
+      max_offset_index = i
+
   print "ATE: " + str(summ/len(cx))
 
+  # define the size of the figure
+  plt.figure(figsize=(12,8))
+
+  plt.title("Plot source: "+str(sys.argv[1])+
+            "\nATE: "+str(summ/len(cx))+"m"+
+            "\nMax offset: "+str(max_offset)+"m")
   plt.plot(rx, ry, "-ro", label="Ground truth")
   plt.plot(cx, cy, label="Reference trajectory")
+  plt.plot(cx[max_offset_index], cy[max_offset_index], 'ro')
   plt.ylabel("Y coordinate (m)")
   plt.xlabel("X coordinate (m)")
   plt.legend(loc="upper left")
